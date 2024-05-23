@@ -25,7 +25,7 @@ include_directories(include)
 add_executable(mtz src/flow_based.cpp)
 
 target_link_libraries(mtz 
-                        PRIVATE utillib
+                        # PRIVATE utillib
                         PRIVATE ${CPLEX_LIBRARIES}
                           )
 
@@ -33,5 +33,5 @@ target_include_directories(mtz PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 enable_testing()
 
-add_subdirectory(src)
+# add_subdirectory(src)
 add_subdirectory(tests)
