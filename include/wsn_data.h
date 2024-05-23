@@ -86,7 +86,7 @@ WSN_data::WSN_data(std::string path, int number_trees) : instance_path(path),
                                                          number_trees(number_trees),
                                                          is_file_instance(true)
 {
-    WSN_data::n = read_instance(instance_path, WSN_data::weight, WSN_data::is_connected);
+    WSN_data::n = read_instance_wsn(instance_path, WSN_data::weight, WSN_data::is_connected);
 
     initialize_calculated_data();
 }
@@ -95,7 +95,7 @@ WSN_data::WSN_data(std::string path) : instance_path(path),
                                        number_trees(1),
                                        is_file_instance(true)
 {
-    WSN_data::n = read_instance(instance_path, WSN_data::weight, WSN_data::is_connected);
+    WSN_data::n = read_instance_wsn(instance_path, WSN_data::weight, WSN_data::is_connected);
 
     initialize_calculated_data();
 }

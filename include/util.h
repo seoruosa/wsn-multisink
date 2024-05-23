@@ -1,12 +1,17 @@
 #pragma once
 
-// #include <iostream>
 #include <string>
 #include <vector>
 #include <set>
 #include <sstream>
 #include <fstream>
 
+/**
+ * @brief Transform a string with a integer number written in a int number
+ * 
+ * @param num is a string input with a number
+ * @return int  
+ */
 int numero(std::string num)
 {
     std::stringstream ss(num);
@@ -15,6 +20,12 @@ int numero(std::string num)
     return retorno;
 }
 
+/**
+ * @brief Transform a string with a double number written in a double number
+ * 
+ * @param num is a string input with a number
+ * @return double 
+ */
 double numerodouble(std::string num)
 {
     std::stringstream ss(num);
@@ -23,7 +34,14 @@ double numerodouble(std::string num)
     return retorno;
 }
 
-/*Create a list of elements that have a arc from node v*/
+/**
+ * @brief Transform a matrix of adjacency in a list of adjacency. 
+ * Each position is associated with a node i. Each position contains 
+ * a set of nodes j, such that arc {i, j} exists.
+ * 
+ * @param adj_matrix is the matrix of adjacency
+ * @return std::vector<std::set<int>> list of adjacency
+ */
 std::vector<std::set<int>> to_adj_list_out(std::vector<std::vector<int>> &adj_matrix)
 {
     int n = adj_matrix.size();
@@ -36,7 +54,6 @@ std::vector<std::set<int>> to_adj_list_out(std::vector<std::vector<int>> &adj_ma
         {
             if (adj_matrix[from][to] == 1)
             {
-                // adj_list[from].push_back(to);
                 adj_list[from].insert(to);
             }
         }
@@ -45,7 +62,14 @@ std::vector<std::set<int>> to_adj_list_out(std::vector<std::vector<int>> &adj_ma
     return adj_list;
 }
 
-/*Create a list of elements that is connected to node v*/
+/**
+ * @brief Transform a matrix of adjacency in a list of adjacency. 
+ * Each position is associated with a node i. Each position contains 
+ * a set of nodes j, such that arc {j, i} exists.
+ * 
+ * @param adj_matrix is the matrix of adjacency
+ * @return std::vector<std::set<int>> list of adjacency
+ */
 std::vector<std::set<int>> to_adj_list_in(std::vector<std::vector<int>> &adj_matrix)
 {
     int n = adj_matrix.size();
@@ -58,7 +82,6 @@ std::vector<std::set<int>> to_adj_list_in(std::vector<std::vector<int>> &adj_mat
         {
             if (adj_matrix[from][to] == 1)
             {
-                // adj_list[to].push_back(from);
                 adj_list[to].insert(from);
             }
         }
@@ -67,13 +90,33 @@ std::vector<std::set<int>> to_adj_list_in(std::vector<std::vector<int>> &adj_mat
     return adj_list;
 }
 
-int read_instance(std::string instance_path,
-                  std::vector<std::vector<double>> &c,
-                  std::vector<std::vector<int>> &MA,
-                  double &t)
+/**
+ * @brief Data from a instance of a graph
+ * 
+ */
+struct Instance
 {
-    int n;
-    int m;
+    int number_nodes;
+    int number_edges;
+    std::vector<std::vector<double>> weight_matrix;
+    std::vector<std::vector<int>> adjacency_matrix;
+};
+
+
+/**
+ * @brief Read a instance of WSN problem, as defined in https://github.com/seoruosa/instances/tree/main/MSCWSN
+ * 
+ * @param instance_path is a path to the instance
+ * @param weight_matrix pointer to a matrix of double where the weight matrix will be stored
+ * @param adjacency_matrix pointer to a matrix of int where the matrix of adjacency will be stored
+ * @return int the number of nodes of instance
+ */
+int read_instance_wsn(std::string instance_path,
+                  std::vector<std::vector<double>> &weight_matrix,
+                  std::vector<std::vector<int>> &adjacency_matrix)
+{
+    int number_nodes;
+    int number_edges;
     int entrada;
     int saida;
     std::string auxiliar;
@@ -82,24 +125,15 @@ int read_instance(std::string instance_path,
     if (arquivo.is_open())
     {
         arquivo >> auxiliar;
-        n = numero(auxiliar);
+        number_nodes = numero(auxiliar);
 
         arquivo >> auxiliar;
-        m = numero(auxiliar);
+        number_edges = numero(auxiliar);
         
-        c = std::vector<std::vector<double>>(n, std::vector<double>(n, 1000));
-        MA = std::vector<std::vector<int>>(n, std::vector<int>(n, 0));
+        weight_matrix = std::vector<std::vector<double>>(number_nodes, std::vector<double>(number_nodes, 1000));
+        adjacency_matrix = std::vector<std::vector<int>>(number_nodes, std::vector<int>(number_nodes, 0));
 
-        for (int i = 0; i < n; i++)
-        {
-            for (int j = 0; j < n; j++)
-            {
-                c[i][j] = 1000;
-                MA[i][j] = 0;
-            }
-        }
-
-        for (int i = 0; i < m; i++)
+        for (int i = 0; i < number_edges; i++)
         {
             arquivo >> auxiliar;
             entrada = numero(auxiliar) - 1;
@@ -108,24 +142,15 @@ int read_instance(std::string instance_path,
             saida = numero(auxiliar) - 1;
 
             arquivo >> auxiliar;
-            c[entrada][saida] = numerodouble(auxiliar);
-            c[saida][entrada] = numerodouble(auxiliar);
-            // cout<<"entrada "<<entrada+1<<" saida "<<saida+1<<" custo "<<numero(auxiliar)<<endl;
-            MA[entrada][saida] = 1;
-            MA[saida][entrada] = 1;
+            weight_matrix[entrada][saida] = numerodouble(auxiliar);
+            weight_matrix[saida][entrada] = numerodouble(auxiliar);
+            
+            adjacency_matrix[entrada][saida] = 1;
+            adjacency_matrix[saida][entrada] = 1;
         }
 
         arquivo.close();
     }
 
-    return n;
-}
-
-int read_instance(std::string instance_path,
-                  std::vector<std::vector<double>> &c,
-                  std::vector<std::vector<int>> &MA)
-{
-    double t;
-
-    return read_instance(instance_path, c, MA, t);
+    return number_nodes;
 }
