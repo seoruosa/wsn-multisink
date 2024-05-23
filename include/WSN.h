@@ -1,9 +1,12 @@
 #pragma once
 
+#include <ilcplex/ilocplex.h>
 #include "util_data.h"
-// #include "wsn_data.h"
+#include "util_results.h"
+#include "wsn_data.h"
 #include <iostream>
 #include "wsn_solution.h"
+#include "util_model.h"
 
 class WSN
 {
@@ -406,7 +409,7 @@ IloModel WSN::create_relaxed()
 
     relaxed.add(model);
 
-    relaxed = conversion::relax_2_index(relaxed, x);
+    relaxed = relax_utils::relax_2_index(relaxed, x);
     relaxed.add(IloConversion(env, y, ILOFLOAT));
     relaxed.add(IloConversion(env, z, ILOFLOAT));
 
