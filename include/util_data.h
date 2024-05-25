@@ -7,10 +7,27 @@
 
 #include "util_results.h"
 
-std::vector<std::vector<int>> read_bin_matrix(IloArray<IloNumVarArray> &matrix, int size, int number_of_trees, std::vector<std::set<int>> &adj_list_from_v, IloCplex &cplex, int sum_to_index)
+/**
+ * @brief Read the values of boolean cplex variable that is represented as a matrix.
+ * Read values of adjacency list and from sinks (nodes + k, k \in (0, ..., number_trees - 1)).
+ * 
+ * @param matrix is a boolean cplex variable represented as a matrix
+ * @param nodes is the number of nodes associated with the variable
+ * @param number_of_trees is the number of sinks
+ * @param adj_list_from_v is the list of adjacency
+ * @param cplex is the cplex object
+ * @param sum_to_index is a constant to be summed to the index of variable
+ * @return std::vector<std::vector<int>> is a matrix of arcs with value on solution greater than 0.01
+ */
+std::vector<std::vector<int>> read_bin_matrix(IloArray<IloNumVarArray> &matrix, 
+                                              int nodes, 
+                                              int number_of_trees, 
+                                              std::vector<std::set<int>> &adj_list_from_v, 
+                                              IloCplex &cplex, 
+                                              int sum_to_index)
 {
     std::vector<std::vector<int>> vec;
-    for (int i = 0; i < size; i++)
+    for (int i = 0; i < nodes; i++)
     {
         for (auto &j : adj_list_from_v[i])
         {
@@ -31,10 +48,10 @@ std::vector<std::vector<int>> read_bin_matrix(IloArray<IloNumVarArray> &matrix, 
         {
             try
             {
-                auto val = cplex.getValue(matrix[size + k][i]);
+                auto val = cplex.getValue(matrix[nodes + k][i]);
                 if (val > 0.01)
                 {
-                    vec.push_back({size + k + sum_to_index, i + sum_to_index});
+                    vec.push_back({nodes + k + sum_to_index, i + sum_to_index});
                 }
             }
             catch (IloException &e)
@@ -46,26 +63,78 @@ std::vector<std::vector<int>> read_bin_matrix(IloArray<IloNumVarArray> &matrix, 
     return vec;
 }
 
-std::vector<std::vector<int>> read_bin_matrix(IloArray<IloNumVarArray> &matrix, WSN_data &instance, IloCplex &cplex, int sum_to_index)
+/**
+ * @brief Read the values of boolean cplex variable that is represented as a matrix.
+ * Read values of adjacency list and from sinks (nodes + k, k \in (0, ..., number_trees - 1)).
+ * 
+ * @param matrix is a boolean cplex variable represented as a matrix
+ * @param instance is the instance object (number of nodes, number of trees and adjacency list is used)
+ * @param cplex is the cplex object
+ * @param sum_to_index is a constant to be summed to the index of variable
+ * @return std::vector<std::vector<int>> is a matrix of arcs with value on solution greater than 0.01
+ */
+std::vector<std::vector<int>> read_bin_matrix(IloArray<IloNumVarArray> &matrix, 
+                                              WSN_data &instance, 
+                                              IloCplex &cplex, 
+                                              int sum_to_index)
 {
     return read_bin_matrix(matrix, instance.n, instance.number_trees, instance.adj_list_from_v, cplex, sum_to_index);
 }
 
-std::vector<std::vector<int>> read_bin_sol_matrix(IloArray<IloNumVarArray> &matrix, int size, int number_of_trees, std::vector<std::set<int>> &adj_list_from_v, IloCplex &cplex, int sum_to_index)
+/**
+ * @brief Read the values of boolean cplex variable that is represented as a matrix.
+ * Read values of adjacency list.
+ * 
+ * @param matrix is a boolean cplex variable represented as a matrix
+ * @param nodes is the number of nodes associated with the variable
+ * @param number_of_trees is the number of sinks
+ * @param adj_list_from_v is the list of adjacency
+ * @param cplex is the cplex object
+ * @param sum_to_index is a constant to be summed to the index of variable
+ * @return std::vector<std::vector<int>> is a matrix of arcs with value on solution greater than 0.01
+ */
+std::vector<std::vector<int>> read_bin_sol_matrix(IloArray<IloNumVarArray> &matrix, 
+                                                  int nodes, 
+                                                  int number_of_trees, 
+                                                  std::vector<std::set<int>> &adj_list_from_v, 
+                                                  IloCplex &cplex, 
+                                                  int sum_to_index)
 {
-    return read_bin_matrix(matrix, size, 0, adj_list_from_v, cplex, sum_to_index);
+    return read_bin_matrix(matrix, nodes, 0, adj_list_from_v, cplex, sum_to_index);
 }
 
-std::vector<std::vector<int>> read_bin_sol_matrix(IloArray<IloNumVarArray> &matrix, WSN_data &instance, IloCplex &cplex, int sum_to_index)
+/**
+ * @brief Read the values of boolean cplex variable that is represented as a matrix.
+ * Read values of adjacency list.
+ * 
+ * @param matrix is a boolean cplex variable represented as a matrix
+ * @param instance is the instance object (number of nodes, number of trees and adjacency list is used)
+ * @param cplex is the cplex object
+ * @param sum_to_index is a constant to be summed to the index of variable
+ * @return std::vector<std::vector<int>> is a matrix of arcs with value on solution greater than 0.01
+ */
+std::vector<std::vector<int>> read_bin_sol_matrix(IloArray<IloNumVarArray> &matrix, 
+                                                  WSN_data &instance, 
+                                                  IloCplex &cplex, 
+                                                  int sum_to_index)
 {
     return read_bin_matrix(matrix, instance.n, 0, instance.adj_list_from_v, cplex, sum_to_index);
 }
 
-std::vector<int> read_bin_vec(IloNumVarArray &vec, int size, IloCplex &cplex, int sum_to_index)
+/**
+ * @brief Read the values of boolean cplex variable that is represented as a vector.
+ * 
+ * @param vec is a boolean cplex variable represented as a vector
+ * @param nodes is the nodes of vector
+ * @param cplex is the cplex object
+ * @param sum_to_index is a constant to be summed to the index of variable
+ * @return std::vector<int> is a vector of arcs with value on solution greater than 0.01
+ */
+std::vector<int> read_bin_vec(IloNumVarArray &vec, int nodes, IloCplex &cplex, int sum_to_index)
 {
     std::vector<int> vec_out;
 
-    for (int i = 0; i < size; i++)
+    for (int i = 0; i < nodes; i++)
     {
         try
         {
@@ -84,11 +153,20 @@ std::vector<int> read_bin_vec(IloNumVarArray &vec, int size, IloCplex &cplex, in
     return vec_out;
 };
 
-std::vector<std::vector<int>> read_bin_vec_to_matrix(IloNumVarArray &vec, int size, IloCplex &cplex, int sum_to_index)
+/**
+ * @brief Read the values of boolean cplex variable that is represented as a vector.
+ * 
+ * @param vec is a boolean cplex variable represented as a vector
+ * @param nodes is the nodes of vector
+ * @param cplex is the cplex object
+ * @param sum_to_index is a constant to be summed to the index of variable
+ * @return std::vector<std::vector<int>> is a vector of arcs with value on solution greater than 0.01
+ */
+std::vector<std::vector<int>> read_bin_vec_to_matrix(IloNumVarArray &vec, int nodes, IloCplex &cplex, int sum_to_index)
 {
     std::vector<std::vector<int>> vec_out;
 
-    for (int i = 0; i < size; i++)
+    for (int i = 0; i < nodes; i++)
     {
         try
         {
@@ -107,7 +185,18 @@ std::vector<std::vector<int>> read_bin_vec_to_matrix(IloNumVarArray &vec, int si
     return vec_out;
 };
 
-std::pair<std::vector<std::vector<int>>, std::vector<double>> read_full_vec_to_matrix(IloNumVarArray &vec, IloCplex &cplex, int sum_to_index)
+/**
+ * @brief Read the values of cplex variable that is represented as a vector.
+ * 
+ * @param vec is a cplex variable represented as a vector
+ * @param cplex is the cplex object
+ * @param sum_to_index is a constant to be summed to the index of variable
+ * @return std::pair<std::vector<std::vector<int>>, std::vector<double>> is a pair of a matrix of index 
+ * and a list of respective values, for solution values greater than zero
+ */
+std::pair<std::vector<std::vector<int>>, std::vector<double>> read_full_vec_to_matrix(IloNumVarArray &vec, 
+                                                                                      IloCplex &cplex, 
+                                                                                      int sum_to_index)
 {
     std::vector<std::vector<int>> vec_out;
     std::vector<double> values;
@@ -132,9 +221,18 @@ std::pair<std::vector<std::vector<int>>, std::vector<double>> read_full_vec_to_m
     return {vec_out, values};
 };
 
-// Read a matrix of variables and returns a pair of a vector with the pair of index and a list with values.
-// Just have index on matrix or value, when value it's greater than zero.
-std::pair<std::vector<std::vector<int>>, std::vector<double>> read_full_matrix(IloArray<IloNumVarArray> &matrix, IloCplex &cplex, int sum_to_index)
+/**
+ * @brief Read the values of cplex variable that is represented as a matrix.
+ * 
+ * @param matrix is a cplex variable represented as a matrix
+ * @param cplex is the cplex object
+ * @param sum_to_index is a constant to be summed to the index of variable
+ * @return std::pair<std::vector<std::vector<int>>, std::vector<double>> is a pair of a matrix of arcs 
+ * and a list of respective values, for solution values greater than zero
+ */
+std::pair<std::vector<std::vector<int>>, std::vector<double>> read_full_matrix(IloArray<IloNumVarArray> &matrix, 
+                                                                               IloCplex &cplex, 
+                                                                               int sum_to_index)
 {
     std::vector<std::vector<int>> vec;
     std::vector<double> values;
@@ -161,8 +259,18 @@ std::pair<std::vector<std::vector<int>>, std::vector<double>> read_full_matrix(I
     return {vec, values};
 }
 
+/**
+ * @brief Read the values of cplex variable that is represented as a matrix.
+ * 
+ * @param matrix_3d is a cplex variable represented as a matrix with 3 index
+ * @param cplex is the cplex object
+ * @param sum_to_index is a constant to be summed to the index of variable
+ * @return std::pair<std::vector<std::vector<int>>, std::vector<double>>  is a pair of a matrix of 3 index 
+ * and a list of respective values, for solution values greater than zero
+ */
 std::pair<std::vector<std::vector<int>>, std::vector<double>> read_matrix_3d(IloArray<IloArray<IloNumVarArray>> &matrix_3d,
-                                                                             IloCplex &cplex, int sum_to_index)
+                                                                             IloCplex &cplex, 
+                                                                             int sum_to_index)
 {
     std::vector<std::vector<int>> vec;
     std::vector<double> values;
@@ -192,71 +300,104 @@ std::pair<std::vector<std::vector<int>>, std::vector<double>> read_matrix_3d(Ilo
     return std::pair<std::vector<std::vector<int>>, std::vector<double>>({vec, values});
 }
 
-void print_solution(IloCplex &cplex, IloArray<IloNumVarArray> &x, IloNumVarArray &y, IloNumVarArray &z, int n, int number_of_trees,
-                    std::vector<std::set<int>> &adj_list_from_v, int sum_to_index, std::ostream &cout)
+/**
+ * @brief Print a solution values
+ * 
+ * @param cplex is the cplex object
+ * @param x is the cplex variable of arcs of solution
+ * @param y is the cplex variable represent a node is a master or not
+ * @param z is the cplex variable represent a node is a bridge or not
+ * @param nodes is the number of nodes
+ * @param number_of_trees is the number of sinks
+ * @param adj_list_from_v is the list of adjacency
+ * @param sum_to_index is a constant to be summed to the index of variable
+ * @param cout is stream output
+ */
+void print_solution(IloCplex &cplex, IloArray<IloNumVarArray> &x, 
+                                              IloNumVarArray &y, 
+                                              IloNumVarArray &z, 
+                                              int nodes, 
+                                              int number_of_trees,
+                                              std::vector<std::set<int>> &adj_list_from_v, 
+                                              int sum_to_index, 
+                                              std::ostream &cout)
 {
-
-    // auto read_int_3_idx_matrix = [](IloArray<IloArray<IloNumVarArray>> &matrix, int n_k, int n, auto adj_list_from_v, IloCplex &cplex, int sum_to_index = 0)
-    // {
-    //     std::vector<std::vector<double>> vec_out;
-
-    //     for (int k = 0; k < n_k; k++)
-    //     {
-    //         for (int i = 0; i < n; i++)
-    //         {
-    //             for (auto &j : adj_list_from_v[i])
-    //             {
-    //                 auto val = cplex.getValue(matrix[k][i][j]);
-
-    //                 if (val > 0.01)
-    //                 {
-    //                     vec_out.push_back({double(k + sum_to_index), double(i + sum_to_index), double(j + sum_to_index), val});
-    //                 }
-    //             }
-    //         }
-    //         for (int idx = 0; idx < n; idx++)
-    //         {
-    //             auto val = cplex.getValue(matrix[k][n + k][idx]);
-
-    //             if (val > 0.01)
-    //             {
-    //                 vec_out.push_back({double(k + sum_to_index), double(n + k + sum_to_index), double(idx + sum_to_index), val});
-    //             }
-    //         }
-    //     }
-
-    //     return vec_out;
-    // };
-
-    auto matrix_x = read_bin_sol_matrix(x, n, number_of_trees, adj_list_from_v, cplex, 1);
+    auto matrix_x = read_bin_sol_matrix(x, nodes, number_of_trees, adj_list_from_v, cplex, 1);
     print_matrix(matrix_x, "X", cout);
 
-    auto vec_y = read_bin_vec_to_matrix(y, n, cplex, 1);
+    auto vec_y = read_bin_vec_to_matrix(y, nodes, cplex, 1);
     print_matrix(vec_y, "Y", cout);
 
-    auto vec_z = read_bin_vec_to_matrix(z, n, cplex, 1);
+    auto vec_z = read_bin_vec_to_matrix(z, nodes, cplex, 1);
     print_matrix(vec_z, "z", cout);
-
-    // auto vec_f_depot = read_int_3_idx_matrix(f_depot, number_of_trees, n, adj_list_from_v, cplex, 1);
-    // print_matrix(vec_f_depot, "F_SINK");
 
     cout << "EOF" << std::endl;
 }
 
-void print_solution(IloCplex &cplex, IloArray<IloNumVarArray> &x, IloNumVarArray &y, IloNumVarArray &z, int n, int number_of_trees,
-                    std::vector<std::set<int>> &adj_list_from_v, int sum_to_index)
+/**
+ * @brief Print a solution values on the standard output
+ * 
+ * @param cplex is the cplex object
+ * @param x is the cplex variable of arcs of solution
+ * @param y is the cplex variable represent a node is a master or not
+ * @param z is the cplex variable represent a node is a bridge or not
+ * @param nodes is the number of nodes
+ * @param number_of_trees is the number of sinks
+ * @param adj_list_from_v is the list of adjacency
+ * @param sum_to_index is a constant to be summed to the index of variable
+ */
+void print_solution(IloCplex &cplex, 
+                    IloArray<IloNumVarArray> &x, 
+                    IloNumVarArray &y, 
+                    IloNumVarArray &z, 
+                    int nodes, 
+                    int number_of_trees,
+                    std::vector<std::set<int>> &adj_list_from_v, 
+                    int sum_to_index)
 {
-    print_solution(cplex, x, y, z, n, number_of_trees, adj_list_from_v, sum_to_index, std::cout);
+    print_solution(cplex, x, y, z, nodes, number_of_trees, adj_list_from_v, sum_to_index, std::cout);
 }
 
-void print_solution(IloCplex &cplex, IloArray<IloNumVarArray> &x, IloNumVarArray &y, IloNumVarArray &z, WSN_data &instance, int sum_to_index, std::ostream &cout)
+/**
+  * @brief Print a solution values
+ * 
+ * @param cplex is the cplex object
+ * @param x is the cplex variable of arcs of solution
+ * @param y is the cplex variable represent a node is a master or not
+ * @param z is the cplex variable represent a node is a bridge or not
+ * @param instance is the instance object (number of nodes, number of trees and adjacency list is used)
+ * @param sum_to_index is a constant to be summed to the index of variable
+ * @param cout is stream output
+ */
+void print_solution(IloCplex &cplex, 
+                    IloArray<IloNumVarArray> &x, 
+                    IloNumVarArray &y, 
+                    IloNumVarArray &z, 
+                    WSN_data &instance, 
+                    int sum_to_index, 
+                    std::ostream &cout)
 {
     cout << instance << std::endl;
 
     print_solution(cplex, x, y, z, instance.n, instance.number_trees, instance.adj_list_from_v, sum_to_index, cout);
 }
 
-void print_solution(IloCplex &cplex, IloArray<IloNumVarArray> &x, IloNumVarArray &y, IloNumVarArray &z, WSN_data &instance, int sum_to_index)
+/**
+ * @brief Print a solution values on the standard output
+ * 
+ * @param cplex is the cplex object
+ * @param x is the cplex variable of arcs of solution
+ * @param y is the cplex variable represent a node is a master or not
+ * @param z is the cplex variable represent a node is a bridge or not
+ * @param instance is the instance object (number of nodes, number of trees and adjacency list is used)
+ * @param sum_to_index is a constant to be summed to the index of variable
+ */
+void print_solution(IloCplex &cplex, 
+                    IloArray<IloNumVarArray> &x, 
+                    IloNumVarArray &y, 
+                    IloNumVarArray &z, 
+                    WSN_data &instance, 
+                    int sum_to_index)
 {
     print_solution(cplex, x, y, z, instance, sum_to_index, std::cout);
 }
