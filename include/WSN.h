@@ -8,11 +8,14 @@
 #include "wsn_solution.h"
 #include "util_model.h"
 
+/**
+ * @brief Class that defines a common part of implementation of a mip model for WSN problem
+ * 
+ */
 class WSN
 {
 public:
     WSN(WSN_data &instance, std::string formulation_name);
-    // ~WSN();
     void solve(bool solve_relaxed = false);
     std::string name_model_instance();
 
@@ -73,9 +76,15 @@ protected:
     virtual void create_start_solution(IloCplex &cplex);
     virtual void set_params_cplex(IloCplex &cplex);
 
+    // relax the created model, solve and print all necessary outputs
+    virtual void solve_relaxed(std::string &name_model_instance, std::string time_now);
+
+    // solve and print all necessary outputs of model
+    virtual void solve_mip(std::string &name_model_instance, std::string time_now);
+
+    // print outputs of the full solution
     virtual void print_full(IloCplex &cplex, std::ostream &cout = std::cout);
 };
-
 
 WSN::WSN(WSN_data &instance, std::string formulation_name) : instance(instance),
                                                              formulation_name(formulation_name),
@@ -88,7 +97,7 @@ WSN::WSN(WSN_data &instance, std::string formulation_name) : instance(instance),
 {
 }
 
-void WSN::solve(bool solve_relaxed)
+void WSN::solve(bool _solve_relaxed)
 {
     auto _name_model_instance = name_model_instance();
     std::string time_now = print::time_now();
@@ -96,104 +105,13 @@ void WSN::solve(bool solve_relaxed)
     build_model();
     model.add(constraints);
 
-    // double start, end, elapsed;
-    auto start = perf::time::start();
-    double gap;
-
-    if (solve_relaxed)
+    if (_solve_relaxed)
     {
-        // https://www.ibm.com/support/pages/solving-linear-relaxation-mip-concert
-        std::ofstream relaxed_out((_name_model_instance + ".relaxed.out").c_str());
-        std::ofstream relaxed_sol((_name_model_instance + ".relaxed.sol").c_str());
-
-        relaxed_out << time_now << std::endl;
-        relaxed_sol << time_now << std::endl;
-
-        // SOLVE RELAXED
-        auto relaxed = create_relaxed();
-        IloCplex cplex_relax(relaxed);
-        cplex_relax.setOut(relaxed_out);
-        cplex_relax.setWarning(relaxed_out);
-        cplex_relax.setError(relaxed_out);
-
-        cplex_relax.exportModel((_name_model_instance + ".relaxed.lp").c_str());
-
-        start = perf::time::start();
-        cplex_relax.solve();
-
-        gap = cplex_relax.getMIPRelativeGap();
-
-        auto elapsed = perf::time::duration(start);
-
-        auto out_info = [&elapsed, &cplex_relax, &gap](auto &out)
-        {
-            out << "time: " << elapsed.count() << std::endl;
-            out << "obj: " << cplex_relax.getObjValue() << std::endl;
-            out << "gap: " << (gap * 100) << " %" << std::endl;
-        };
-
-        out_info(relaxed_out);
-        out_info(relaxed_sol);
-
-        relaxed_sol << "***************************************" << std::endl;
-        print_full(cplex_relax, relaxed_sol);
-
-        cplex_relax.clear();
-        cplex_relax.end();
+        solve_relaxed(_name_model_instance, time_now);
     }
     else
     {
-        std::ofstream cplex_out((_name_model_instance + ".log").c_str());
-        std::ofstream cplex_warn_error((_name_model_instance + ".warn.log").c_str());
-        std::ofstream solution((_name_model_instance + ".sol").c_str());
-        std::ofstream cout((_name_model_instance + ".out").c_str());
-
-        cout << time_now << std::endl;
-        solution << time_now << std::endl;
-
-        // SOLVE ORIGINAL MODEL
-        IloCplex cplex(model);
-
-        cplex.setOut(cplex_out);
-        cplex.setWarning(cplex_warn_error);
-        cplex.setError(cplex_warn_error);
-
-        cplex.exportModel((_name_model_instance + ".lp").c_str());
-
-        start = perf::time::start();
-        set_params_cplex(cplex);
-
-        create_start_solution(cplex);
-
-        cplex.solve();
-
-        gap = cplex.getMIPRelativeGap();
-
-        auto elapsed = perf::time::duration(start).count();
-
-        cout << "time: " << elapsed << std::endl;
-        cout << "obj: " << cplex.getObjValue() << std::endl;
-        cout << "best_obj: " << cplex.getBestObjValue() << std::endl;
-        cout << "gap: " << (gap * 100) << " %" << std::endl;
-        cout << "status: " << cplex.getStatus() << std::endl;
-
-        print_solution(cplex, x, y, z, instance, 1, solution);
-
-        WSN_solution solution_checker(instance);
-
-        auto matrix_x = read_bin_sol_matrix(x, instance, cplex, 0);
-        auto vec_y = read_bin_vec(y, instance.n, cplex, 0);
-        auto vec_z = read_bin_vec(z, instance.n, cplex, 0);
-
-        auto solution_valid = solution_checker.is_valid(matrix_x, vec_y, vec_z);
-
-        cout << "Solution is" << (solution_valid ? "" : " not") << " valid" << std::endl;
-
-        cout << "***************************************" << std::endl;
-        print_full(cplex, cout);
-
-        cplex.clear();
-        cplex.end();
+        solve_mip(_name_model_instance, time_now);
     }
 }
 
@@ -426,6 +344,103 @@ void WSN::set_params_cplex(IloCplex &cplex)
     cplex.setParam(IloCplex::Param::Conflict::Display, 2);
     // cplex.setParam(IloCplex::Param::MIP::Limits::RepairTries, 10000);
     cplex.setParam(IloCplex::Param::MIP::Tolerances::MIPGap, 1e-6);
+}
+
+void WSN::solve_relaxed(std::string &name_model_instance, std::string time_now)
+{
+    // https://www.ibm.com/support/pages/solving-linear-relaxation-mip-concert
+    std::ofstream relaxed_out((name_model_instance + ".relaxed.out").c_str());
+    std::ofstream relaxed_sol((name_model_instance + ".relaxed.sol").c_str());
+
+    relaxed_out << time_now << std::endl;
+    relaxed_sol << time_now << std::endl;
+
+    // SOLVE RELAXED
+    auto relaxed = create_relaxed();
+    IloCplex cplex_relax(relaxed);
+    cplex_relax.setOut(relaxed_out);
+    cplex_relax.setWarning(relaxed_out);
+    cplex_relax.setError(relaxed_out);
+
+    cplex_relax.exportModel((name_model_instance + ".relaxed.lp").c_str());
+
+    auto start = perf::time::start();
+    cplex_relax.solve();
+
+    double gap = cplex_relax.getMIPRelativeGap();
+
+    auto elapsed = perf::time::duration(start);
+
+    auto out_info = [&elapsed, &cplex_relax, &gap](auto &out)
+    {
+        out << "time: " << elapsed.count() << std::endl;
+        out << "obj: " << cplex_relax.getObjValue() << std::endl;
+        out << "gap: " << (gap * 100) << " %" << std::endl;
+    };
+
+    out_info(relaxed_out);
+    out_info(relaxed_sol);
+
+    relaxed_sol << "***************************************" << std::endl;
+    print_full(cplex_relax, relaxed_sol);
+
+    cplex_relax.clear();
+    cplex_relax.end();
+}
+
+void WSN::solve_mip(std::string &name_model_instance, std::string time_now)
+{
+    std::ofstream cplex_out((name_model_instance + ".log").c_str());
+        std::ofstream cplex_warn_error((name_model_instance + ".warn.log").c_str());
+        std::ofstream solution((name_model_instance + ".sol").c_str());
+        std::ofstream cout((name_model_instance + ".out").c_str());
+
+        cout << time_now << std::endl;
+        solution << time_now << std::endl;
+
+        // SOLVE ORIGINAL MODEL
+        IloCplex cplex(model);
+
+        cplex.setOut(cplex_out);
+        cplex.setWarning(cplex_warn_error);
+        cplex.setError(cplex_warn_error);
+
+        cplex.exportModel((name_model_instance + ".lp").c_str());
+
+        auto start = perf::time::start();
+        set_params_cplex(cplex);
+
+        create_start_solution(cplex);
+
+        cplex.solve();
+
+        double gap = cplex.getMIPRelativeGap();
+
+        auto elapsed = perf::time::duration(start).count();
+
+        cout << "time: " << elapsed << std::endl;
+        cout << "obj: " << cplex.getObjValue() << std::endl;
+        cout << "best_obj: " << cplex.getBestObjValue() << std::endl;
+        cout << "gap: " << (gap * 100) << " %" << std::endl;
+        cout << "status: " << cplex.getStatus() << std::endl;
+
+        print_solution(cplex, x, y, z, instance, 1, solution);
+
+        WSN_solution solution_checker(instance);
+
+        auto matrix_x = read_bin_sol_matrix(x, instance, cplex, 0);
+        auto vec_y = read_bin_vec(y, instance.n, cplex, 0);
+        auto vec_z = read_bin_vec(z, instance.n, cplex, 0);
+
+        auto solution_valid = solution_checker.is_valid(matrix_x, vec_y, vec_z);
+
+        cout << "Solution is" << (solution_valid ? "" : " not") << " valid" << std::endl;
+
+        cout << "***************************************" << std::endl;
+        print_full(cplex, cout);
+
+        cplex.clear();
+        cplex.end();
 }
 
 void WSN::print_full(IloCplex &cplex, std::ostream &cout)
