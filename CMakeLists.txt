@@ -22,6 +22,7 @@ include_directories(SYSTEM ${CPLEX_INCLUDE_DIRS})
 
 include_directories(include)
 
+# add_executable(play src/playground.cpp)
 add_executable(mtz src/flow_based.cpp)
 
 target_link_libraries(mtz 
