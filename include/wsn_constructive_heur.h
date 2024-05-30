@@ -322,7 +322,7 @@ inline SolutionHeuristic WSNConstructiveHeuristic::solve(unsigned seed)
         std::shuffle(order.begin(), order.end(), rng);
     }
 
-    util::print::print_vec(best_order, ">> BEST FOUND ORDER");
+    // util::print::print_vec(best_order, ">> BEST FOUND ORDER");
 
     return build(best_order);
 }
