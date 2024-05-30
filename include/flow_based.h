@@ -7,8 +7,10 @@
 #include <iostream>
 #include <chrono>
 
-
-
+/**
+ * @brief Structure with necessary parameters from input
+ * 
+ */
 struct Run_Params
 {
     std::string instance_path;
@@ -18,6 +20,10 @@ struct Run_Params
     bool relaxed = false;
 };
 
+/**
+ * @brief Print a help message
+ * 
+ */
 void PrintHelp()
 {
     auto print_list = [](auto &list, std::string sep = " | ")
@@ -40,6 +46,13 @@ void PrintHelp()
     exit(1);
 }
 
+/**
+ * @brief Parse the arguments from program call
+ * 
+ * @param argc 
+ * @param argv 
+ * @return Run_Params is the structure with parsed arguments
+ */
 Run_Params read_arguments(int argc, char **argv)
 {
     const char *const short_opts = "K:ri:m:s:h";
