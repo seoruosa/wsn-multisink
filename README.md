@@ -21,4 +21,4 @@
 * Create tests 
   * wsn_constructive_heur.h
 * Refactor
-  * 
+  * create folder utils
