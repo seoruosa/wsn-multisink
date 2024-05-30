@@ -42,7 +42,12 @@
 #include "models/WSN_repr_model_base.h"
 
 
-
+/**
+ * @brief Create a model runner and initialize with all models
+ * 
+ * @param instance is a problem instances
+ * @return std::unique_ptr<ModelRunner<WSN>> is a pointer to the model runner
+ */
 std::unique_ptr<ModelRunner<WSN>> initialize_all_models(WSN_data &instance)
 {
     std::unique_ptr<ModelRunner<WSN>> model_runner = std::make_unique<ModelRunner<WSN>>();

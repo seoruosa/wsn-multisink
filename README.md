@@ -14,18 +14,11 @@
 
 ## To Do
 * Clean
-  * ~~util_data.h~~
-  * ~~funcoes.cpp~~
-  * ~~funcoes.h~~
-  * ~~util.h~~
-  * flow_based.h
-  * flow_based.cpp
+  * wsn_constructive_heur.h
 * Document
-  * ~~util_data.h~~
-  * ~~util.h~~
-  * ~~funcoes.h~~
-  * ~~WSN.h~~
-* Create tests
-* ~~maybe create a util_instance.h~~
+  * models/*
+  * wsn_constructive_heur.h
+* Create tests 
+  * wsn_constructive_heur.h
 * Refactor
-  * main (of flow_based)
+  * 
