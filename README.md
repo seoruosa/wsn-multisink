@@ -15,6 +15,7 @@
 ## To Do
 * Clean
   * wsn_constructive_heur.h
+  * unused models
 * Document
   * models/*
   * wsn_constructive_heur.h
@@ -22,3 +23,5 @@
   * wsn_constructive_heur.h
 * Refactor
   * create folder utils
+  * create iterator for nodes, arcs and edges
+  * think in a way to run part of model as input argument
