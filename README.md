@@ -21,7 +21,9 @@
   * wsn_constructive_heur.h
 * Create tests 
   * wsn_constructive_heur.h
+  * for model using a real instance
 * Refactor
   * create folder utils
   * create iterator for nodes, arcs and edges
   * think in a way to run part of model as input argument
+  * wsn.h
