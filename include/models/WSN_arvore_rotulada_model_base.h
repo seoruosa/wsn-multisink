@@ -3,8 +3,11 @@
 #include "WSN.h"
 #include <limits>
 
-#include "wsn_constructive_heur.h"
-
+/**
+ * @brief Class that implements the "labeled" tree formulation. 
+ * The model uses variables to assign a node and arc to a tree.
+ * 
+ */
 class WSN_arvore_rotulada_model_base : public WSN
 {
 public:
@@ -13,7 +16,8 @@ public:
 private:
     virtual void build_model();
 
-    IloArray<IloArray<IloNumVarArray>> x_sink; // arc-sink assignment
+    // arc-sink assignment: it is x(i,j,k)=1 if arc (i,j) belongs to the tree k at solution
+    IloArray<IloArray<IloNumVarArray>> x_sink;
 
     IloArray<IloNumVarArray> y_sink; // master sink assignment
     IloArray<IloNumVarArray> z_sink; // bridge sink assignment
@@ -45,7 +49,7 @@ private:
     // Valid inequalities
     void add_CastroAndrade2023_valid_inequalities();
     void add_adasme2023_valid_inequalities();
-    void add_mcf_valid_inequalities();
+    void add_arv_rotulada_valid_inequalities();
 
     void add_testing_valid_inequalities();
     void add_remove_symmetries();
@@ -102,7 +106,7 @@ inline void WSN_arvore_rotulada_model_base::build_model()
     // Valid inequalities
     add_CastroAndrade2023_valid_inequalities();
     add_adasme2023_valid_inequalities();
-    add_mcf_valid_inequalities();
+    add_arv_rotulada_valid_inequalities();
 
     add_testing_valid_inequalities();
     add_remove_symmetries();
@@ -409,9 +413,6 @@ void WSN_arvore_rotulada_model_base::add_flow_limit_constraints()
             constraints.add(x[i][to] <= f[i][to]);
         }
 
-        // arc from node r
-        // constraints.add(x[instance.n][i] <= f[instance.n][i]);
-
         for (int k = 0; k < instance.number_trees; k++)
         {
             constraints.add(x_sink[k][instance.n][i] <= f[instance.n + k][i]); // arc from node r
@@ -477,12 +478,6 @@ inline void WSN_arvore_rotulada_model_base::add_CastroAndrade2023_valid_inequali
             // constraint 16 and 17
             constraints.add(x[i][j] <= z[i] + z[j]);
             constraints.add(x[i][j] <= y[i] + y[j]);
-
-            // for (int k = 0; k < instance.number_trees; k++)
-            // {
-            //     constraints.add(x_sink[k][i][j] <= z_sink[k][i] + z_sink[k][j]);
-            //     constraints.add(x_sink[k][i][j] <= y_sink[k][i] + y_sink[k][j]);
-            // }
         }
     }
 }
@@ -537,7 +532,7 @@ inline void WSN_arvore_rotulada_model_base::add_adasme2023_valid_inequalities()
     exp_ad_28.end();
 }
 
-void WSN_arvore_rotulada_model_base::add_mcf_valid_inequalities()
+void WSN_arvore_rotulada_model_base::add_arv_rotulada_valid_inequalities()
 {
     // Constraints 50 (Adasme2023)
     for (int i = 0; i < instance.n; i++)
