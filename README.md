@@ -9,7 +9,7 @@
 
 ## Running
 ```
-    ./mtz -i <instance_path> -m <model_name> -K <number_sinks> [-r]
+    ./build/all_models -i <instance_path> -m <model_name> -K <number_sinks> [-r]
 ```
 
 ## To Do
