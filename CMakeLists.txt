@@ -23,14 +23,14 @@ include_directories(SYSTEM ${CPLEX_INCLUDE_DIRS})
 include_directories(include)
 
 # add_executable(play src/playground.cpp)
-add_executable(mtz src/flow_based.cpp)
+add_executable(all_models src/all_models.cpp)
 
-target_link_libraries(mtz 
+target_link_libraries(all_models 
                         # PRIVATE utillib
                         PRIVATE ${CPLEX_LIBRARIES}
                           )
 
-target_include_directories(mtz PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
+target_include_directories(all_models PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 enable_testing()
 
