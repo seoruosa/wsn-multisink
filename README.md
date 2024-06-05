@@ -27,3 +27,37 @@
   * create iterator for nodes, arcs and edges
   * think in a way to run part of model as input argument
   * wsn.h
+* Organize models
+  * Others
+    * WSN_arvore_rotulada_model_base.h   
+    * WSN_repr_model_base.h
+  * Flow-based
+    * WSN_flow_model_0_1.h               
+    * WSN_flow_model_0.h                 
+    * WSN_flow_model_1.h                 
+    * WSN_flow_model_2_1_base.h          
+    * WSN_flow_model_2_1.h               
+    * WSN_flow_model_2_1_sbc.h          
+    * WSN_flow_model_2.h                
+    * WSN_flow_model_3_base.h           
+    * WSN_flow_model_3_check_instance.h
+    * WSN_flow_model_3_des.h            
+    * WSN_flow_model_3idx.h             
+  * MCF        
+    * WSN_mcf_model_castro2023.h
+    * WSN_mcf_model_adasme2023.h        
+    * WSN_mcf_model_base.h               
+    * WSN_mcf_model.h
+    * WSN_mcf_model_mcf_valid.h
+    * WSN_mcf_model_weight_on_node_benders.h
+    * WSN_mcf_model_weight_on_node.h
+    * WSN_mcf_weight_arc.h
+  * MTZ
+    * WSN_mtz_castroandrade2023-bektas2014.h
+    * WSN_mtz_castroandrade2023.h
+    * WSN_mtz_castroandrade2023-impSBPO-corrigido.h
+    * WSN_mtz_castroandrade2023-impSBPO.h
+    * WSN_mtz_castroandrade2023-new_constr.h
+    * WSN_mtz_model_2_1.h
+    * WSN_mtz_model_2.h
+    * WSN_mtz_model.h
