@@ -27,18 +27,19 @@
   * create iterator for nodes, arcs and edges
   * think in a way to run part of model as input argument
   * wsn.h
+    * Have to create a destructor to the class? Need to use env.end()??
 * Organize models
   * Others
     * WSN_arvore_rotulada_model_base.h   
     * WSN_repr_model_base.h
   * Flow-based
-    * WSN_flow_model_0_1.h               
+    * WSN_flow_model_0_1.h
     * ~~WSN_flow_model_0.h~~
-    * WSN_flow_model_1.h                 
-    * WSN_flow_model_2_1_base.h          
-    * WSN_flow_model_2_1.h               
-    * WSN_flow_model_2_1_sbc.h          
-    * WSN_flow_model_2.h                
+    * WSN_flow_model_1.h -> check the differences with *WSN_flow_model_0_1.h*
+    * WSN_flow_model_2_1_base.h
+    * WSN_flow_model_2_1.h -> inherites from *2_1_base*
+    * WSN_flow_model_2_1_sbc.h -> inherites from *2_1_base* plus balancing and breaking symmetries constraints
+    * ~~WSN_flow_model_2.h~~         
     * WSN_flow_model_3_base.h           
     * WSN_flow_model_3_check_instance.h
     * WSN_flow_model_3_des.h            
@@ -55,8 +56,9 @@
   * MTZ
     * WSN_mtz_castroandrade2023-bektas2014.h
     * WSN_mtz_castroandrade2023.h
-    * WSN_mtz_castroandrade2023-impSBPO-corrigido.h
-    * WSN_mtz_castroandrade2023-impSBPO.h
+    * ~~WSN_mtz_castroandrade2023-impSBPO-corrigido.h~~
+    * ~~WSN_mtz_castroandrade2023-impSBPO.h~~
+    * WSN_mtz_castroandrade2023-SBPO.h
     * WSN_mtz_castroandrade2023-new_constr.h
     * WSN_mtz_model_2_1.h
     * WSN_mtz_model_2.h
