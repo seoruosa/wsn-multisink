@@ -1,7 +1,7 @@
 #pragma once
 
 #include "WSN.h"
-#include "wsn_constructive_heur.h"
+// #include "wsn_constructive_heur.h"
 
 class WSN_flow_model_0_1 : public WSN
 {
@@ -45,11 +45,11 @@ private:
 };
 
 WSN_flow_model_0_1::WSN_flow_model_0_1(WSN_data &instance) : WSN(instance, "FlowModel0-1"),
-                                                         f(IloArray<IloNumVarArray>(env, instance.n + 1)),
-                                                         w(IloArray<IloNumVarArray>(env, instance.n + 1)),
-                                                         t(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
-                                                         T(IloNumVar(env, 0, IloInfinity, ILOFLOAT)),
-                                                         M(int(calculates_big_M()))
+                                                             f(IloArray<IloNumVarArray>(env, instance.n + 1)),
+                                                             w(IloArray<IloNumVarArray>(env, instance.n + 1)),
+                                                             t(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
+                                                             T(IloNumVar(env, 0, IloInfinity, ILOFLOAT)),
+                                                             M(int(calculates_big_M()))
 {
 }
 
@@ -276,68 +276,6 @@ void WSN_flow_model_0_1::add_lower_bound_constraints()
         expr = IloExpr(env);
     }
     expr.end();
-
-    expr = IloExpr(env);
-    for (int i = 0; i < instance.n; i++)
-    {
-        for (auto &to : instance.adj_list_from_v[i])
-        {
-            expr += instance.weight[i][to] * x[i][to];
-        }
-    }
-    constraints.add(T >= expr/instance.n);
-    expr.end();
-
-    expr.end();
-
-    auto minimum_weight = [&]()
-    {
-        double min = std::numeric_limits<double>::max();
-
-        for (int i = 0; i < instance.n; i++)
-        {
-            for (auto &to : instance.adj_list_from_v[i])
-            {
-                if (instance.weight[i][to] < min)
-                {
-                    min = instance.weight[i][to];
-                }
-            }
-        }
-        return min;
-    };
-
-    auto avg_weight = [&]()
-    {
-        int count = 0;
-        double avg = 0;
-
-        for (int i = 0; i < instance.n; i++)
-        {
-            for (auto &to : instance.adj_list_from_v[i])
-            {
-                avg = (avg*count + instance.weight[i][to])/(count + 1);
-                ++count;
-            }
-        }
-
-        return avg;
-    };
-
-    auto min_weight = minimum_weight();
-    // auto min_weight = avg_weight();
-    
-    // IloExpr expr_2(env);
-    // for (int i = 0; i < instance.n; i++)
-    // {
-    //     // constraints.add(T >= min_weight*f[instance.n][i]);
-    //     expr_2 += f[instance.n][i];
-    // }
-
-    // constraints.add(T >= min_weight*expr_2);
-
-    // expr_2.end();
-
 }
 
 void WSN_flow_model_0_1::add_leaf_constraints()
@@ -359,16 +297,12 @@ inline void WSN_flow_model_0_1::add_adasme2023_valid_inequalities()
     {
         if (instance.adj_list_to_v[i].size() == 1)
         {
-            // // constraint 19
-            // constraints.add(z[i] == 0);
-
             for (auto &from : instance.adj_list_to_v[i])
             {
                 // constraint 20
                 constraints.add(y[from] + y[i] == 1);
 
                 // constraint 21
-                // constraints.add(2 * z[from] <= y[i] + x[from][i]);
                 constraints.add(2 * (x[from][i] + x[i][from]) <= y[i] + z[from]);
             }
         }
@@ -435,19 +369,6 @@ inline void WSN_flow_model_0_1::add_adasme2023_valid_inequalities()
         // Constraints 50
         constraints.add(x[instance.n][i] <= y[i]);
     }
-
-//     for (int i = 0; i < instance.n; i++)
-//     {
-//         for (auto &j : instance.adj_list_from_v[i])
-//         {
-
-//             // Constraints 51
-//             constraints.add(f[i][j] <= instance.number_trees - 1 - 2 * (y[i] - x[instance.n][i]) - z[i]);
-
-//             // Constraints 52
-//             constraints.add(f[i][j] <= instance.number_trees - 1 - y[j] - 2 * z[j] + 2*x[instance.n][i]);
-//         }
-//     }
 }
 
 void WSN_flow_model_0_1::add_CastroAndrade2023_valid_inequalities()
