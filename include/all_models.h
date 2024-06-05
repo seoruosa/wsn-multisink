@@ -9,7 +9,6 @@
 #include "models/WSN_mtz_model.h"
 #include "models/WSN_mtz_model_2.h"
 #include "models/WSN_flow_model_1.h"
-#include "models/WSN_flow_model_2.h"
 #include "models/WSN_flow_model_0_1.h"
 #include "models/WSN_mtz_model_2_1.h"
 
@@ -54,14 +53,8 @@ std::unique_ptr<ModelRunner<WSN>> initialize_all_models(WSN_data &instance)
     (*model_runner).insert_model(WSN_flow_model_3_check_instance(instance), "check-instance");
     (*model_runner).insert_model(WSN_flow_model_3idx(instance), "FlowModel3idx");
 
-    (*model_runner).insert_model(WSN_mtz_model(instance), "MTZ");
-
-    (*model_runner).insert_model(WSN_mtz_model_2(instance), "MTZ2");
-
     (*model_runner).insert_model(WSN_flow_model_1(instance), "FlowModel1");
-    (*model_runner).insert_model(WSN_flow_model_2(instance), "FlowModel2");
     (*model_runner).insert_model(WSN_flow_model_0_1(instance), "FlowModel0-1");
-    (*model_runner).insert_model(WSN_mtz_model_2_1(instance), "MTZ2-1");
     (*model_runner).insert_model(WSN_flow_model_2_1_base(instance), "FlowModel2-1-base");
     (*model_runner).insert_model(WSN_flow_model_2_1(instance), "FlowModel2-1");
     (*model_runner).insert_model(WSN_flow_model_2_1_sbc(instance), "FlowModel2-1-sbc");
@@ -69,6 +62,9 @@ std::unique_ptr<ModelRunner<WSN>> initialize_all_models(WSN_data &instance)
     (*model_runner).insert_model(WSN_flow_model_3_des(instance), "FlowModel3-des");
 
     // ####################### MTZ Models #######################
+    (*model_runner).insert_model(WSN_mtz_model(instance), "MTZ");
+    (*model_runner).insert_model(WSN_mtz_model_2(instance), "MTZ2");
+    (*model_runner).insert_model(WSN_mtz_model_2_1(instance), "MTZ2-1");
     (*model_runner).insert_model(WSN_mtz_castro_andrade_2023(instance), "MTZ-castro2023");
     (*model_runner).insert_model(WSN_mtz_castro_andrade_2023_imp_sbpo(instance), "MTZ-sbpo");
     (*model_runner).insert_model(WSN_mtz_castro_andrade_2023_imp_sbpo_corrigido(instance), "MTZ-sbpo-corr");

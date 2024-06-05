@@ -208,8 +208,6 @@ void WSN_flow_model_2_1_base::add_flow_limit_constraints()
         }
 
         // arc from node r
-        // constraints.add(x[instance.n][i] <= f[instance.n][i]);
-
         for (int k = 0; k < instance.number_trees; k++)
         {
             constraints.add(x[instance.n + k][i] <= f[instance.n + k][i]); // arc from node r
