@@ -432,6 +432,6 @@ inline void WSN_mtz_castro_andrade_2023::add_adasme2023_valid_inequalities()
         exp_ad_30 += (pi[i] - z[i] - 2 * y[i]);
     }
 
-    constraints.add(exp_ad_30 >= -2 * instance.number_trees);
+    constraints.add(exp_ad_30 >= -2 * instance.number_trees); // TODO check this
     exp_ad_30.end();
 }

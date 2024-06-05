@@ -16,6 +16,7 @@
 * Clean
   * wsn_constructive_heur.h
   * unused models
+  * check TODOs
 * Document
   * models/*
   * wsn_constructive_heur.h
