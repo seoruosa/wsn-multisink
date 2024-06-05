@@ -406,11 +406,7 @@ inline void WSN_mtz_castro_andrade_2023_sbpo::add_adasme2023_valid_inequalities(
         {
             for (auto &from : instance.adj_list_to_v[i])
             {
-                // constraint 20
-                constraints.add(y[from] + y[i] == 1);
-
                 // constraint 21
-                // constraints.add(2 * z[from] <= y[i] + x[from][i]);
                 constraints.add(2 * (x[from][i] + x[i][from]) <= y[i] + z[from]);
             }
         }

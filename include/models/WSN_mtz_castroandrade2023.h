@@ -40,7 +40,7 @@ private:
 
     void add_bektas2014_constraints();
 
-    void add_castrodeAndrade2023_constraints(bool SBPO_IMPLEMENTATION_CONSTRAINT_10 = false);
+    void add_castrodeAndrade2023_constraints();
 
     // calculates an big-M
     double calculates_big_M();
@@ -85,11 +85,10 @@ void WSN_mtz_castro_andrade_2023::build_model()
     add_leaf_constraints();                  // Const CA2023 -> 13
     add_trivial_tree_constraints();          // Const CA2023 -> 14
 
-    add_castrodeAndrade2023_constraints(false); // Const CA2023 -> 12, 15, 16, 17, 10 (true: implementação 
-    //                                                                              no SBPO, false: atual),
+    add_castrodeAndrade2023_constraints(); // Const CA2023 -> 12, 15, 16, 17, 10 (implementation had been corrected),
     //                                                             18, 19, 20, 21, 22, 23
-    
-    add_adasme2023_valid_inequalities(); 
+
+    add_adasme2023_valid_inequalities();
     // add_bektas2014_constraints();
 
     add_objective_function(); // Const CA2023 -> pag 5
@@ -277,7 +276,7 @@ void WSN_mtz_castro_andrade_2023::add_bektas2014_constraints()
     }
 }
 
-void WSN_mtz_castro_andrade_2023::add_castrodeAndrade2023_constraints(bool SBPO_IMPLEMENTATION_CONSTRAINT_10)
+void WSN_mtz_castro_andrade_2023::add_castrodeAndrade2023_constraints()
 {
 
     IloExpr expr(env);
@@ -299,62 +298,30 @@ void WSN_mtz_castro_andrade_2023::add_castrodeAndrade2023_constraints(bool SBPO_
         expr = IloExpr(env);
     }
 
-    if (!SBPO_IMPLEMENTATION_CONSTRAINT_10)
+    for (int u = 0; u < instance.n; u++)
     {
-        for (int u = 0; u < instance.n; u++)
+        std::set<int> neighbors(instance.adj_list_from_v[u]);
+        neighbors.insert(u); // neighbors = N[u]
+
+        expr -= (y[u] + z[u]);
+        for (auto &v : instance.adj_list_from_v[u])
         {
-            std::set<int> neighbors(instance.adj_list_from_v[u]);
-            neighbors.insert(u); // neighbors = N[u]
+            expr += x[u][v];
+            expr -= (y[v] + z[v]);
 
-            expr -= (y[u] + z[u]);
-            for (auto &v : instance.adj_list_from_v[u])
+            for (auto &l : instance.adj_list_from_v[v])
             {
-                expr += x[u][v];
-                expr -= (y[v] + z[v]);
-
-                for (auto &l : instance.adj_list_from_v[v])
+                if (neighbors.find(l) != neighbors.end())
                 {
-                    if (neighbors.find(l) != neighbors.end())
-                    {
-                        expr += x[v][l];
-                    }
+                    expr += x[v][l];
                 }
             }
-
-            constraints.add(expr <= -1); // constraints 10
-
-            expr.end();
-            expr = IloExpr(env);
         }
-    }
-    else
-    {
-        // IMPLEMENTAÇÃO SBPO
-        for (int u = 0; u < instance.n; u++)
-        {
-            expr += (y[u] + z[u]);
 
-            for (int v = 0; v < instance.n; v++)
-            {
-                if (instance.is_connected[u][v] == 1)
-                {
-                    expr += (y[v] + z[v]);
-                }
-            }
+        constraints.add(expr <= -1); // constraints 10
 
-            for (int v = 0; v < instance.n; v++)
-            {
-                if (instance.is_connected[u][v] == 1)
-                {
-                    expr -= (x[u][v] + x[v][u]);
-                }
-            }
-
-            constraints.add(expr >= 1); // constraints 10
-
-            expr.end();
-            expr = IloExpr(env);
-        }
+        expr.end();
+        expr = IloExpr(env);
     }
 
     expr.end();
@@ -445,11 +412,7 @@ inline void WSN_mtz_castro_andrade_2023::add_adasme2023_valid_inequalities()
         {
             for (auto &from : instance.adj_list_to_v[i])
             {
-                // constraint 20
-                // constraints.add(y[from] + y[i] == 1);
-
                 // constraint 21
-                // constraints.add(2 * z[from] <= y[i] + x[from][i]);
                 constraints.add(2 * (x[from][i] + x[i][from]) <= y[i] + z[from]);
             }
         }
@@ -469,6 +432,6 @@ inline void WSN_mtz_castro_andrade_2023::add_adasme2023_valid_inequalities()
         exp_ad_30 += (pi[i] - z[i] - 2 * y[i]);
     }
 
-    constraints.add(exp_ad_30 >= -2*instance.number_trees);
+    constraints.add(exp_ad_30 >= -2 * instance.number_trees);
     exp_ad_30.end();
 }
