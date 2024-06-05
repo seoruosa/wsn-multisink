@@ -3,11 +3,11 @@
 #include "WSN.h"
 #include "wsn_constructive_heur.h"
 
-class WSN_mtz_castro_andrade_2023_imp_sbpo_corrigido : public WSN
+class WSN_mtz_castro_andrade_2023_sbpo : public WSN
 {
     // Implementação do modelo do artigo CastroAndrade2023 da SBPO
 public:
-    WSN_mtz_castro_andrade_2023_imp_sbpo_corrigido(WSN_data &instance);
+    WSN_mtz_castro_andrade_2023_sbpo(WSN_data &instance);
     // ~WSN_mtz_model_2();
 
 private:
@@ -40,7 +40,7 @@ private:
 
     void add_bektas2014_constraints();
 
-    void add_castrodeAndrade2023_constraints(bool SBPO_IMPLEMENTATION_CONSTRAINT_10 = false);
+    void add_castrodeAndrade2023_constraints();
 
     // calculates an big-M
     double calculates_big_M();
@@ -50,18 +50,18 @@ private:
     virtual void set_params_cplex(IloCplex &cplex);
 };
 
-WSN_mtz_castro_andrade_2023_imp_sbpo_corrigido::WSN_mtz_castro_andrade_2023_imp_sbpo_corrigido(WSN_data &instance) : WSN(instance, "MTZ-sbpo-corr"),
-                                                                               w(IloArray<IloNumVarArray>(env, instance.n)),
-                                                                               t(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
-                                                                               pi(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
-                                                                               T(IloNumVar(env, 0, IloInfinity, ILOFLOAT)),
-                                                                               p((instance.n - instance.number_trees + 1) / 2),
-                                                                               M(int(calculates_big_M()))
+WSN_mtz_castro_andrade_2023_sbpo::WSN_mtz_castro_andrade_2023_sbpo(WSN_data &instance) : WSN(instance, "MTZ-sbpo-corr"),
+                                                                                         w(IloArray<IloNumVarArray>(env, instance.n)),
+                                                                                         t(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
+                                                                                         pi(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
+                                                                                         T(IloNumVar(env, 0, IloInfinity, ILOFLOAT)),
+                                                                                         p((instance.n - instance.number_trees + 1) / 2),
+                                                                                         M(int(calculates_big_M()))
 //    M(100000)
 {
 }
 
-void WSN_mtz_castro_andrade_2023_imp_sbpo_corrigido::build_model()
+void WSN_mtz_castro_andrade_2023_sbpo::build_model()
 {
     // create_basic_model_constraints(); // constraints 2, 4-9
 
@@ -85,23 +85,22 @@ void WSN_mtz_castro_andrade_2023_imp_sbpo_corrigido::build_model()
     add_leaf_constraints();                  // Const CA2023 -> 13
     add_trivial_tree_constraints();          // Const CA2023 -> 14
 
-    add_castrodeAndrade2023_constraints(false); // Const CA2023 -> 12, 15, 16, 17, 10 (true: implementação 
-    //                                                                              no SBPO, false: atual),
+    add_castrodeAndrade2023_constraints(); // Const CA2023 -> 12, 15, 16, 17, 10 (implementation had been corrected),
     //                                                             18, 19, 20, 21, 22, 23
-    
-    // add_adasme2023_valid_inequalities(); 
+
+    // add_adasme2023_valid_inequalities();
     // add_bektas2014_constraints();
 
     add_objective_function(); // Const CA2023 -> pag 5
 }
 
-void WSN_mtz_castro_andrade_2023_imp_sbpo_corrigido::set_params_cplex(IloCplex &cplex)
+void WSN_mtz_castro_andrade_2023_sbpo::set_params_cplex(IloCplex &cplex)
 {
     WSN::set_params_cplex(cplex);
     // cplex.setParam(IloCplex::Param::Benders::Strategy, 3);
 }
 
-void WSN_mtz_castro_andrade_2023_imp_sbpo_corrigido::add_objective_function()
+void WSN_mtz_castro_andrade_2023_sbpo::add_objective_function()
 {
     model.add(IloMinimize(env, T));
 
@@ -111,7 +110,7 @@ void WSN_mtz_castro_andrade_2023_imp_sbpo_corrigido::add_objective_function()
     }
 }
 
-void WSN_mtz_castro_andrade_2023_imp_sbpo_corrigido::add_mtz_model_variables()
+void WSN_mtz_castro_andrade_2023_sbpo::add_mtz_model_variables()
 {
     T.setName("T");
 
@@ -134,7 +133,7 @@ void WSN_mtz_castro_andrade_2023_imp_sbpo_corrigido::add_mtz_model_variables()
     }
 }
 
-void WSN_mtz_castro_andrade_2023_imp_sbpo_corrigido::add_subtour_constraints()
+void WSN_mtz_castro_andrade_2023_sbpo::add_subtour_constraints()
 {
     for (int i = 0; i < instance.n; i++)
     {
@@ -146,7 +145,7 @@ void WSN_mtz_castro_andrade_2023_imp_sbpo_corrigido::add_subtour_constraints()
     }
 }
 
-void WSN_mtz_castro_andrade_2023_imp_sbpo_corrigido::add_in_coming_edge_mtz_constraints()
+void WSN_mtz_castro_andrade_2023_sbpo::add_in_coming_edge_mtz_constraints()
 {
     // Constraints 4
     IloExpr expr(env);
@@ -167,7 +166,7 @@ void WSN_mtz_castro_andrade_2023_imp_sbpo_corrigido::add_in_coming_edge_mtz_cons
     expr.end();
 }
 
-void WSN_mtz_castro_andrade_2023_imp_sbpo_corrigido::add_calculate_weight_tree_constraints()
+void WSN_mtz_castro_andrade_2023_sbpo::add_calculate_weight_tree_constraints()
 {
     IloExpr expr(env);
 
@@ -190,7 +189,7 @@ void WSN_mtz_castro_andrade_2023_imp_sbpo_corrigido::add_calculate_weight_tree_c
     }
 }
 
-void WSN_mtz_castro_andrade_2023_imp_sbpo_corrigido::add_lower_bound_weight_constraints()
+void WSN_mtz_castro_andrade_2023_sbpo::add_lower_bound_weight_constraints()
 {
     IloExpr expr(env);
 
@@ -210,7 +209,7 @@ void WSN_mtz_castro_andrade_2023_imp_sbpo_corrigido::add_lower_bound_weight_cons
     expr.end();
 }
 
-void WSN_mtz_castro_andrade_2023_imp_sbpo_corrigido::add_leaf_constraints()
+void WSN_mtz_castro_andrade_2023_sbpo::add_leaf_constraints()
 {
     for (int i = 0; i < instance.n; i++)
     {
@@ -222,7 +221,7 @@ void WSN_mtz_castro_andrade_2023_imp_sbpo_corrigido::add_leaf_constraints()
     }
 }
 
-double WSN_mtz_castro_andrade_2023_imp_sbpo_corrigido::calculates_big_M()
+double WSN_mtz_castro_andrade_2023_sbpo::calculates_big_M()
 {
     double M_weight = 1.0;
     std::vector<double> weights;
@@ -245,7 +244,7 @@ double WSN_mtz_castro_andrade_2023_imp_sbpo_corrigido::calculates_big_M()
     return M_weight;
 }
 
-void WSN_mtz_castro_andrade_2023_imp_sbpo_corrigido::add_bektas2014_constraints()
+void WSN_mtz_castro_andrade_2023_sbpo::add_bektas2014_constraints()
 {
     int n = instance.n;
 
@@ -271,7 +270,7 @@ void WSN_mtz_castro_andrade_2023_imp_sbpo_corrigido::add_bektas2014_constraints(
     }
 }
 
-void WSN_mtz_castro_andrade_2023_imp_sbpo_corrigido::add_castrodeAndrade2023_constraints(bool SBPO_IMPLEMENTATION_CONSTRAINT_10)
+void WSN_mtz_castro_andrade_2023_sbpo::add_castrodeAndrade2023_constraints()
 {
 
     IloExpr expr(env);
@@ -293,62 +292,30 @@ void WSN_mtz_castro_andrade_2023_imp_sbpo_corrigido::add_castrodeAndrade2023_con
         expr = IloExpr(env);
     }
 
-    if (!SBPO_IMPLEMENTATION_CONSTRAINT_10)
+    for (int u = 0; u < instance.n; u++)
     {
-        for (int u = 0; u < instance.n; u++)
+        std::set<int> neighbors(instance.adj_list_from_v[u]);
+        neighbors.insert(u); // neighbors = N[u]
+
+        expr -= (y[u] + z[u]);
+        for (auto &v : instance.adj_list_from_v[u])
         {
-            std::set<int> neighbors(instance.adj_list_from_v[u]);
-            neighbors.insert(u); // neighbors = N[u]
+            expr += x[u][v];
+            expr -= (y[v] + z[v]);
 
-            expr -= (y[u] + z[u]);
-            for (auto &v : instance.adj_list_from_v[u])
+            for (auto &l : instance.adj_list_from_v[v])
             {
-                expr += x[u][v];
-                expr -= (y[v] + z[v]);
-
-                for (auto &l : instance.adj_list_from_v[v])
+                if (neighbors.find(l) != neighbors.end())
                 {
-                    if (neighbors.find(l) != neighbors.end())
-                    {
-                        expr += x[v][l];
-                    }
+                    expr += x[v][l];
                 }
             }
-
-            constraints.add(expr <= -1); // constraints 10
-
-            expr.end();
-            expr = IloExpr(env);
         }
-    }
-    else
-    {
-        // IMPLEMENTAÇÃO SBPO
-        for (int u = 0; u < instance.n; u++)
-        {
-            expr += (y[u] + z[u]);
 
-            for (int v = 0; v < instance.n; v++)
-            {
-                if (instance.is_connected[u][v] == 1)
-                {
-                    expr += (y[v] + z[v]);
-                }
-            }
+        constraints.add(expr <= -1); // constraints 10
 
-            for (int v = 0; v < instance.n; v++)
-            {
-                if (instance.is_connected[u][v] == 1)
-                {
-                    expr -= (x[u][v] + x[v][u]);
-                }
-            }
-
-            constraints.add(expr >= 1); // constraints 10
-
-            expr.end();
-            expr = IloExpr(env);
-        }
+        expr.end();
+        expr = IloExpr(env);
     }
 
     expr.end();
@@ -430,7 +397,7 @@ void WSN_mtz_castro_andrade_2023_imp_sbpo_corrigido::add_castrodeAndrade2023_con
     exp_ad_33.end();
 }
 
-inline void WSN_mtz_castro_andrade_2023_imp_sbpo_corrigido::add_adasme2023_valid_inequalities()
+inline void WSN_mtz_castro_andrade_2023_sbpo::add_adasme2023_valid_inequalities()
 {
     // constraints Adasme2023
     for (int i = 0; i < instance.n; i++)

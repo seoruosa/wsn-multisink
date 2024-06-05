@@ -4,7 +4,6 @@
 #include "model_runner.h"
 #include "models/WSN.h"
 
-#include "models/WSN_mtz_castroandrade2023-impSBPO-corrigido.h"
 #include "models/WSN_flow_model_3idx.h"
 #include "models/WSN_mtz_model.h"
 #include "models/WSN_mtz_model_2.h"
@@ -13,8 +12,7 @@
 #include "models/WSN_mtz_model_2_1.h"
 
 #include "models/WSN_mtz_castroandrade2023.h"
-#include "models/WSN_mtz_castroandrade2023-impSBPO.h"
-#include "models/WSN_mtz_castroandrade2023-impSBPO-corrigido.h"
+#include "models/WSN_mtz_castroandrade2023-SBPO.h"
 #include "models/WSN_mtz_castroandrade2023-bektas2014.h"
 #include "models/WSN_mtz_castroandrade2023-new_constr.h"
 
@@ -66,8 +64,7 @@ std::unique_ptr<ModelRunner<WSN>> initialize_all_models(WSN_data &instance)
     (*model_runner).insert_model(WSN_mtz_model_2(instance), "MTZ2");
     (*model_runner).insert_model(WSN_mtz_model_2_1(instance), "MTZ2-1");
     (*model_runner).insert_model(WSN_mtz_castro_andrade_2023(instance), "MTZ-castro2023");
-    (*model_runner).insert_model(WSN_mtz_castro_andrade_2023_imp_sbpo(instance), "MTZ-sbpo");
-    (*model_runner).insert_model(WSN_mtz_castro_andrade_2023_imp_sbpo_corrigido(instance), "MTZ-sbpo-corr");
+    (*model_runner).insert_model(WSN_mtz_castro_andrade_2023_sbpo(instance), "MTZ-sbpo");
     (*model_runner).insert_model(WSN_mtz_castro_andrade_2023_bektas2014(instance), "MTZ-castro2023-bektas");
     (*model_runner).insert_model(WSN_mtz_castro_andrade_2023_new_constraints(instance), "MTZ-castro2023-new-constr");
     
