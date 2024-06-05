@@ -4,11 +4,10 @@
 
 class WSN_flow_model_2_1_base : public WSN
 {
-    // Update WSN_flow_model_2 to remove w_a
 public:
     WSN_flow_model_2_1_base(WSN_data &instance);
 
-private:
+protected:
     virtual void build_model();
 
     IloArray<IloNumVarArray> f;
@@ -115,33 +114,6 @@ void WSN_flow_model_2_1_base::add_objective_function()
 
         expr = IloExpr(env);
     }
-    expr.end();
-    expr = IloExpr(env);
-
-    // for (int k = 0; k < instance.number_trees - 1; k++)
-    // {
-    //     for (int i = 0; i < instance.n; i++)
-    //     {
-    //         for (auto &from : instance.adj_list_to_v[i])
-    //         {
-    //             expr += instance.weight[from][i] * z_depot[k][from][i] - instance.weight[from][i] * z_depot[k + 1][from][i];
-    //         }
-    //     }
-
-    //     model.add(expr >= 0);
-    //     expr.end();
-
-    //     expr = IloExpr(env);
-    // }
-    // for (int i = 0; i < instance.n; i++)
-    // {
-    //     for (auto &from : instance.adj_list_to_v[i])
-    //     {
-    //         expr += instance.weight[from][i] * z_depot[0][from][i];
-    //     }
-    // }
-
-    // model.add(T >= expr);
     expr.end();
 }
 
@@ -417,71 +389,14 @@ inline void WSN_flow_model_2_1_base::add_adasme2023_valid_inequalities()
             constraints.add(x[instance.n + k][i] <= y[i]);
         }
     }
-
-    // IloExpr exp_ad_48(env);
-    // for (int i = 0; i < instance.n; i++)
-    // {
-    //     for (auto &j : instance.adj_list_from_v[i])
-    //     {
-    //         for (int h = 0; h < instance.n; h++)
-    //         {
-    //             exp_ad_48 += f_node[h][i][j];
-    //         }
-
-    //         // Constraints 48
-    //         constraints.add(2 * x[i][j] - z[i] <= exp_ad_48);
-
-    //         exp_ad_48.end();
-    //         exp_ad_48 = IloExpr(env);
-    //     }
-    // }
-    // exp_ad_48.end();
-
-    // IloExpr exp_ad_49(env);
-    // IloExpr exp_ad_49_1(env);
-    // for (int i = 0; i < instance.n; i++)
-    // {
-    //     for (int h = 0; h < instance.n; h++)
-    //     {
-    //         for (auto &from : instance.adj_list_to_v[i])
-    //         {
-    //             exp_ad_49 += f_node[h][from][i];
-    //         }
-    //         exp_ad_49 += f_node[h][instance.n][i];
-    //     }
-
-    //     for (auto &j : instance.adj_list_from_v[i])
-    //     {
-    //         for (int h = 0; h < instance.n; h++)
-    //         {
-    //             exp_ad_49_1 += f_node[h][i][j];
-    //         }
-    //         // Constraints 49
-    //         constraints.add(exp_ad_49_1 + x[i][j] * (instance.n - 1) - exp_ad_49 <= instance.n - 2);
-
-    //         exp_ad_49_1.end();
-    //         exp_ad_49_1 = IloExpr(env);
-    //     }
-
-    //     exp_ad_49.end();
-    //     exp_ad_49 = IloExpr(env);
-    // }
-    // exp_ad_49.end();
-    // exp_ad_49_1.end();
 }
 
 void WSN_flow_model_2_1_base::add_bektas2020_node_current_constraints()
-{
-    // for (int k = 0; k < instance.number_trees; k++)
-    // {
-    //     constraints.add(l[instance.n + k] == (k + 1));
-    // }
-
+{ 
     for (int i = 0; i < instance.n; i++)
     {
         for (auto &j : instance.adj_list_from_v[i])
         {
-            // constraints.add(l[i] - l[j] <= (instance.number_trees - 1) * (1 - x[i][j] - x[j][i]));
             constraints.add(l[i] - l[j] <= (instance.number_trees) * (1 - x[j][i]));
             constraints.add(l[j] - l[i] <= (instance.number_trees) * (1 - x[i][j]));
         }
@@ -496,8 +411,6 @@ void WSN_flow_model_2_1_base::add_arc_depot_assignment_constraints()
         {
             for (auto &j : instance.adj_list_from_v[i])
             {
-                // constraints.add(l[i] - l[j] <= (instance.number_trees) * (1 - z_depot[k][i][j] - z_depot[k][j][i]));
-
                 constraints.add((l[i] - (k + 1)) <= (instance.number_trees) * (1 - z_depot[k][i][j] - z_depot[k][j][i]));
                 constraints.add(((k + 1) - l[i]) <= (instance.number_trees) * (1 - z_depot[k][i][j] - z_depot[k][j][i]));
             }
@@ -603,4 +516,7 @@ void WSN_flow_model_2_1_base::print_full(IloCplex &cplex, std::ostream &cout)
 
     auto [l_full, l_values] = read_full_vec_to_matrix(l, cplex, 1);
     print_matrix(l_full, l_values, "l", cout);
+
+    auto [f_full, f_values] = read_full_matrix(f, cplex, 1);
+    print_matrix(f_full, f_values, "F", cout);
 }
