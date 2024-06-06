@@ -46,12 +46,12 @@
     * **WSN_flow_model_3_des.h** -> inherites from *3_base* plus constraints to be tested
     * WSN_flow_model_3idx.h             
   * MCF        
-    * WSN_mcf_model_castro2023.h
-    * WSN_mcf_model_adasme2023.h        
-    * WSN_mcf_model_base.h               
-    * WSN_mcf_model.h
-    * WSN_mcf_model_mcf_valid.h
-    * WSN_mcf_model_weight_on_node_benders.h
+    * **WSN_mcf_model_castro2023.h**
+    * **WSN_mcf_model_adasme2023.h**        
+    * **WSN_mcf_model_base.h**     
+    *** WSN_mcf_model.h**
+    * **WSN_mcf_model_mcf_valid.h**
+    * ~~WSN_mcf_model_weight_on_node_benders.h~~
     * WSN_mcf_model_weight_on_node.h
     * WSN_mcf_weight_arc.h
   * MTZ

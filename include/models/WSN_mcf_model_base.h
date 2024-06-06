@@ -1,9 +1,6 @@
 #pragma once
 
 #include "WSN.h"
-#include <limits>
-
-#include "wsn_constructive_heur.h"
 
 class WSN_mcf_model_base : public WSN
 {
