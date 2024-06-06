@@ -22,8 +22,12 @@ include_directories(SYSTEM ${CPLEX_INCLUDE_DIRS})
 
 include_directories(include)
 
-# add_executable(play src/playground.cpp)
+add_executable(play src/playground.cpp)
 add_executable(all_models src/all_models.cpp)
+
+target_link_libraries(play 
+                        PRIVATE ${CPLEX_LIBRARIES}
+                          )
 
 target_link_libraries(all_models 
                         # PRIVATE utillib
