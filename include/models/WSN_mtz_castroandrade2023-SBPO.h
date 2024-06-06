@@ -10,7 +10,7 @@ public:
     WSN_mtz_castro_andrade_2023_sbpo(WSN_data &instance);
     // ~WSN_mtz_model_2();
 
-private:
+protected:
     virtual void build_model();
     virtual void add_objective_function();
 

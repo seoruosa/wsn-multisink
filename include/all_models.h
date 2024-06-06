@@ -47,7 +47,6 @@ std::unique_ptr<ModelRunner<WSN>> initialize_all_models(WSN_data &instance)
 {
     std::unique_ptr<ModelRunner<WSN>> model_runner = std::make_unique<ModelRunner<WSN>>();
 
-    (*model_runner).insert_model(WSN_flow_model_3_check_instance(instance), "check-instance");
     (*model_runner).insert_model(WSN_flow_model_3idx(instance), "FlowModel3idx");
 
     (*model_runner).insert_model(WSN_flow_model_1(instance), "FlowModel1");
@@ -55,8 +54,10 @@ std::unique_ptr<ModelRunner<WSN>> initialize_all_models(WSN_data &instance)
     (*model_runner).insert_model(WSN_flow_model_2_1_base(instance), "FlowModel2-1-base");
     (*model_runner).insert_model(WSN_flow_model_2_1(instance), "FlowModel2-1");
     (*model_runner).insert_model(WSN_flow_model_2_1_sbc(instance), "FlowModel2-1-sbc");
+
     (*model_runner).insert_model(WSN_flow_model_3_base(instance), "FlowModel3-base");
     (*model_runner).insert_model(WSN_flow_model_3_des(instance), "FlowModel3-des");
+    (*model_runner).insert_model(WSN_flow_model_3_check_instance(instance), "check-instance");
 
     // ####################### MTZ Models #######################
     (*model_runner).insert_model(WSN_mtz_model(instance), "MTZ");
@@ -68,11 +69,12 @@ std::unique_ptr<ModelRunner<WSN>> initialize_all_models(WSN_data &instance)
     (*model_runner).insert_model(WSN_mtz_castro_andrade_2023_new_constraints(instance), "MTZ-castro2023-new-constr");
     
     // ####################### MCF Models #######################
-    (*model_runner).insert_model(WSN_mcf_model(instance), "MCFModel");
+    (*model_runner).insert_model(WSN_mcf_model_base(instance), "MCFModel-base");
     (*model_runner).insert_model(WSN_mcf_model_mcf_valid(instance), "MCFModel-mcf-valid");
     (*model_runner).insert_model(WSN_mcf_model_castro2023(instance), "MCFModel-castro2023");
     (*model_runner).insert_model(WSN_mcf_model_adasme2023(instance), "MCFModel-adasme2023");
-    (*model_runner).insert_model(WSN_mcf_model_base(instance), "MCFModel-base");
+    (*model_runner).insert_model(WSN_mcf_model(instance), "MCFModel");
+    
     (*model_runner).insert_model(WSN_mcf_model_weight_on_node(instance), "MCFModel-weight-node");
     (*model_runner).insert_model(WSN_arvore_rotulada_model_base(instance), "MAR-base");
     (*model_runner).insert_model(WSN_mcf_weight_arc_model(instance), "MCF-weight-arc-Model");

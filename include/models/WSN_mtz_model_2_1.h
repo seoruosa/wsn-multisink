@@ -208,18 +208,6 @@ void WSN_mtz_model_2_1::add_lower_bound_weight_constraints()
         expr = IloExpr(env);
     }
 
-    // upper bound
-    // // IloExpr expr(env);
-    // for (int i = 0; i < instance.n; i++)
-    // {
-    //     for (auto &j : instance.adj_list_from_v[i])
-    //     {
-    //         expr += x[i][j] * instance.weight[i][j];
-    //     }
-    // }
-
-    // constraints.add(T <= expr);
-
     expr.end();
 }
 
