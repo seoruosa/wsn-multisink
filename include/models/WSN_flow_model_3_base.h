@@ -2,13 +2,17 @@
 
 #include "WSN.h"
 
+/**
+ * @brief A flow-based model where the flow from a node i it is 
+ * the weight of tree rooted at i. It is based on work of Robertty.
+ * 
+ */
 class WSN_flow_model_3_base : public WSN
 {
-    // Model where the flow it's related to the weight of tree
 public:
     WSN_flow_model_3_base(WSN_data &instance);
 
-private:
+protected:
     virtual void build_model();
 
     IloArray<IloNumVarArray> f;
@@ -34,6 +38,7 @@ private:
 
     void add_CastroAndrade2023_valid_inequalities();
     void add_adasme2023_valid_inequalities();
+    void add_testing_valid_inequalities();
 
     void add_remove_symmetries();
 
@@ -333,6 +338,54 @@ inline void WSN_flow_model_3_base::add_adasme2023_valid_inequalities()
             constraints.add(x[instance.n + k][i] <= y[i]);
         }
     }
+}
+
+void WSN_flow_model_3_base::add_testing_valid_inequalities()
+{
+    IloExpr expr(env);
+
+    for (int v = 0; v < instance.n; v++)
+    {
+        for (auto &u : instance.adj_list_from_v[v])
+        {
+            expr += y[u] + x[v][u] + x[u][v];
+        }
+
+        constraints.add(4 * z[v] <= expr); // des. val. 1
+
+        expr.end();
+        expr = IloExpr(env);
+    }
+
+    for (int i = 0; i < instance.n; i++)
+    {
+        for (auto &j : instance.adj_list_from_v[i])
+        {
+
+            constraints.add((x[i][j] + x[j][i]) <= z[i] + z[j]); // des. val. 2
+        }
+    }
+
+    expr = IloExpr(env);
+
+    for (int v = 0; v < instance.n; v++)
+    {
+        for (auto &u : instance.adj_list_from_v[v])
+        {
+            expr += instance.weight[v][u]*(x[v][u] - z[v]);
+        }
+        
+        for (int k = 0; k < instance.number_trees; k++)
+        {
+            // constraints.add(f[instance.n + k][v] >= expr); // des. val. 3 // falso
+            constraints.add(f[instance.n + k][v] <= M*y[v]); // des. val. 4
+        }
+        
+    }
+    
+
+
+    expr.end();
 }
 
 void WSN_flow_model_3_base::add_remove_symmetries()
