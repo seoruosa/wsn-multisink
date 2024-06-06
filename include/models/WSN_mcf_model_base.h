@@ -10,7 +10,7 @@ class WSN_mcf_model_base : public WSN
 public:
     WSN_mcf_model_base(WSN_data &instance);
 
-private:
+protected:
     virtual void build_model();
 
     IloArray<IloArray<IloNumVarArray>> x_sink; // arc-sink assignment
@@ -81,7 +81,7 @@ inline void WSN_mcf_model_base::build_model()
 void WSN_mcf_model_base::set_params_cplex(IloCplex &cplex)
 {
     WSN::set_params_cplex(cplex);
-    cplex.setParam(IloCplex::Param::Benders::Strategy, 3);
+    // cplex.setParam(IloCplex::Param::Benders::Strategy, 3);
 }
 
 inline void WSN_mcf_model_base::add_objective_function()
