@@ -44,7 +44,7 @@
     * **WSN_flow_model_3_base.h**      
     * **WSN_flow_model_3_check_instance.h** -> inherites from *3_base*
     * **WSN_flow_model_3_des.h** -> inherites from *3_base* plus constraints to be tested
-    * WSN_flow_model_3idx.h             
+    * WSN_flow_model_3idx.h
   * MCF        
     * **WSN_mcf_model_castro2023.h**
     * **WSN_mcf_model_adasme2023.h**        
@@ -55,12 +55,12 @@
     * WSN_mcf_model_weight_on_node.h
     * WSN_mcf_weight_arc.h
   * MTZ
-    * WSN_mtz_castroandrade2023-bektas2014.h
-    * WSN_mtz_castroandrade2023.h
+    * **WSN_mtz_castroandrade2023-bektas2014.h** -> inherites from *WSN_mtz_castroandrade2023-SBPO*
+    * **WSN_mtz_castroandrade2023.h** -> inherites from *WSN_mtz_castroandrade2023-SBPO* 
     * ~~WSN_mtz_castroandrade2023-impSBPO-corrigido.h~~
     * ~~WSN_mtz_castroandrade2023-impSBPO.h~~
     * WSN_mtz_castroandrade2023-SBPO.h
-    * WSN_mtz_castroandrade2023-new_constr.h
+    * **WSN_mtz_castroandrade2023-new_constr.h** -> inherites from *WSN_mtz_castroandrade2023-SBPO*
     * WSN_mtz_model_2_1.h
     * WSN_mtz_model_2.h
     * WSN_mtz_model.h
