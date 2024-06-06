@@ -23,7 +23,6 @@
 #include "models/WSN_mcf_model_castro2023.h"
 
 #include "models/WSN_mcf_model_weight_on_node.h"
-#include "models/WSN_mcf_model_weight_on_node_benders.h"
 
 #include "models/WSN_flow_model_2_1.h"
 #include "models/WSN_flow_model_2_1_base.h"
@@ -75,7 +74,6 @@ std::unique_ptr<ModelRunner<WSN>> initialize_all_models(WSN_data &instance)
     (*model_runner).insert_model(WSN_mcf_model_adasme2023(instance), "MCFModel-adasme2023");
     (*model_runner).insert_model(WSN_mcf_model_base(instance), "MCFModel-base");
     (*model_runner).insert_model(WSN_mcf_model_weight_on_node(instance), "MCFModel-weight-node");
-    (*model_runner).insert_model(WSN_mcf_model_weight_on_node_benders(instance), "MCFModel-weight-node-benders");
     (*model_runner).insert_model(WSN_arvore_rotulada_model_base(instance), "MAR-base");
     (*model_runner).insert_model(WSN_mcf_weight_arc_model(instance), "MCF-weight-arc-Model");
     (*model_runner).insert_model(WSN_representante_model_base(instance), "REPR-base");

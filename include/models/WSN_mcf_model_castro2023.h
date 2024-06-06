@@ -1,9 +1,5 @@
 #pragma once
 
-#include "WSN.h"
-#include <limits>
-
-#include "wsn_constructive_heur.h"
 #include "WSN_mcf_model_base.h"
 
 class WSN_mcf_model_castro2023 : public WSN_mcf_model_base
@@ -17,7 +13,7 @@ private:
 
 WSN_mcf_model_castro2023::WSN_mcf_model_castro2023(WSN_data &instance) : WSN_mcf_model_base(instance)
 {
-    WSN::formulation_name = "MCF-Model-castro2023-testing";
+    WSN::formulation_name = "MCF-Model-castro2023";
 }
 
 inline void WSN_mcf_model_castro2023::build_model()
