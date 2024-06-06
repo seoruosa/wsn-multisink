@@ -37,13 +37,13 @@
     * WSN_flow_model_0_1.h
     * ~~WSN_flow_model_0.h~~
     * WSN_flow_model_1.h -> check the differences with *WSN_flow_model_0_1.h*
-    * WSN_flow_model_2_1_base.h
-    * WSN_flow_model_2_1.h -> inherites from *2_1_base*
-    * WSN_flow_model_2_1_sbc.h -> inherites from *2_1_base* plus balancing and breaking symmetries constraints
+    * **WSN_flow_model_2_1_base.h**
+    * **WSN_flow_model_2_1.h** -> inherites from *2_1_base*
+    * **WSN_flow_model_2_1_sbc.h** -> inherites from *2_1_base* plus balancing and breaking symmetries constraints
     * ~~WSN_flow_model_2.h~~         
-    * WSN_flow_model_3_base.h           
-    * WSN_flow_model_3_check_instance.h
-    * WSN_flow_model_3_des.h            
+    * **WSN_flow_model_3_base.h**      
+    * **WSN_flow_model_3_check_instance.h** -> inherites from *3_base*
+    * **WSN_flow_model_3_des.h** -> inherites from *3_base* plus constraints to be tested
     * WSN_flow_model_3idx.h             
   * MCF        
     * WSN_mcf_model_castro2023.h
