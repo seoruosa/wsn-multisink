@@ -46,11 +46,11 @@
     * **WSN_flow_model_3_des.h** -> inherites from *3_base* plus constraints to be tested
     * WSN_flow_model_3idx.h
   * MCF        
-    * **WSN_mcf_model_castro2023.h**
-    * **WSN_mcf_model_adasme2023.h**        
-    * **WSN_mcf_model_base.h**     
-    *** WSN_mcf_model.h**
-    * **WSN_mcf_model_mcf_valid.h**
+    * **WSN_mcf_model_castro2023.h** -> inherites from *WSN_mcf_model_base*
+    * **WSN_mcf_model_adasme2023.h** -> inherites from *WSN_mcf_model_base*
+    * **WSN_mcf_model_base.h**
+    * **WSN_mcf_model.h** -> inherites from *WSN_mcf_model_base*
+    * **WSN_mcf_model_mcf_valid.h** -> inherites from *WSN_mcf_model_base*
     * ~~WSN_mcf_model_weight_on_node_benders.h~~
     * WSN_mcf_model_weight_on_node.h
     * WSN_mcf_weight_arc.h
@@ -64,3 +64,14 @@
     * WSN_mtz_model_2_1.h
     * WSN_mtz_model_2.h
     * WSN_mtz_model.h
+* Models to run experiments (com e sem restrições válidas ~ 2 dias 16 horas)
+  * WSN_arvore_rotulada_model_base.h   
+    * MTZ
+    * Flow-based
+  * WSN_repr_model_base.h
+    * MTZ
+    * Flow-based
+  * WSN_flow_model_2_1.h
+  * WSN_mcf_model.h
+  * WSN_flow_model_3_base.h
+  * WSN_mtz_castroandrade2023-SBPO.h
