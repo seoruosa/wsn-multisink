@@ -31,7 +31,9 @@
 #include "models/WSN_flow_model_3.h"
 
 #include "models/WSN_flow_model_3_check_instance.h"
-#include "models/WSN_arvore_rotulada_model_base.h"
+
+#include "models/WSN_arvore_rotulada_model_mtz.h"
+#include "models/WSN_arvore_rotulada_model_flow.h"
 
 #include "models/WSN_mcf_weight_arc.h"
 #include "models/WSN_repr_model_flow.h"
@@ -78,15 +80,21 @@ std::unique_ptr<ModelRunner<WSN>> initialize_all_models(WSN_data &instance)
     (*model_runner).insert_model(WSN_mcf_model_adasme2023(instance), "MCFModel-adasme2023");
     (*model_runner).insert_model(WSN_mcf_model(instance), "MCFModel");
     
+    (*model_runner).insert_model(WSN_mcf_model_weight_on_node(instance), "MCFModel-weight-node");
+    (*model_runner).insert_model(WSN_mcf_weight_arc_model(instance), "MCF-weight-arc-Model");
+
     // ###################### Proxy Models ######################
     (*model_runner).insert_model(WSN_repr_model_flow_base(instance), "REPR-flow-base");
     (*model_runner).insert_model(WSN_repr_model_flow(instance), "REPR-flow");
     (*model_runner).insert_model(WSN_repr_model_mtz_base(instance), "REPR-mtz-base");
     (*model_runner).insert_model(WSN_repr_model_mtz(instance), "REPR-mtz");
 
-    (*model_runner).insert_model(WSN_mcf_model_weight_on_node(instance), "MCFModel-weight-node");
-    (*model_runner).insert_model(WSN_arvore_rotulada_model_base(instance), "MAR-base");
-    (*model_runner).insert_model(WSN_mcf_weight_arc_model(instance), "MCF-weight-arc-Model");
+    // ####################### MAR Models #######################
+    (*model_runner).insert_model(WSN_arv_rot_model_mtz_base(instance), "MAR-mtz-base");
+    (*model_runner).insert_model(WSN_arv_rot_model_mtz(instance), "MAR-mtz");
+    (*model_runner).insert_model(WSN_arv_rot_model_flow_base(instance), "MAR-flow-base");
+    (*model_runner).insert_model(WSN_arv_rot_model_flow(instance), "MAR-flow");
+    
 
     return model_runner;
 }

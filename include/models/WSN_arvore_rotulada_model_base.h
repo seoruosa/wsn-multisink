@@ -13,7 +13,7 @@ class WSN_arvore_rotulada_model_base : public WSN
 public:
     WSN_arvore_rotulada_model_base(WSN_data &instance);
 
-private:
+protected:
     virtual void build_model();
 
     // arc-sink assignment: it is x(i,j,k)=1 if arc (i,j) belongs to the tree k at solution
