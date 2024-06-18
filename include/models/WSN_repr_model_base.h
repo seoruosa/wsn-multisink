@@ -10,7 +10,7 @@ class WSN_representante_model_base : public WSN
 public:
     WSN_representante_model_base(WSN_data &instance);
 
-private:
+protected:
     virtual void build_model();
 
     IloArray<IloArray<IloNumVarArray>> x_sink; // arc-sink assignment

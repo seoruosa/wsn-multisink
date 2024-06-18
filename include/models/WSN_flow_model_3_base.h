@@ -85,9 +85,9 @@ void WSN_flow_model_3_base::build_model()
     add_leaf_constraints();              // exp 22
 
     // valid inequalities
-    add_adasme2023_valid_inequalities();
-    add_CastroAndrade2023_valid_inequalities();
-    add_remove_symmetries();
+    // add_adasme2023_valid_inequalities();
+    // add_CastroAndrade2023_valid_inequalities();
+    // add_remove_symmetries();
 
     add_objective_function();
 }

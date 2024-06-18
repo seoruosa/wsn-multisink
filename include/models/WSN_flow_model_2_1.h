@@ -12,6 +12,7 @@ public:
 
 WSN_flow_model_2_1::WSN_flow_model_2_1(WSN_data &instance) : WSN_flow_model_2_1_base(instance)
 {
+    WSN::formulation_name = "FlowModel2-1";
 }
 
 inline void WSN_flow_model_2_1::build_model()

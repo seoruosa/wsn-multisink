@@ -50,7 +50,7 @@ protected:
     virtual void set_params_cplex(IloCplex &cplex);
 };
 
-WSN_mtz_castro_andrade_2023_sbpo::WSN_mtz_castro_andrade_2023_sbpo(WSN_data &instance) : WSN(instance, "MTZ-sbpo-corr"),
+WSN_mtz_castro_andrade_2023_sbpo::WSN_mtz_castro_andrade_2023_sbpo(WSN_data &instance) : WSN(instance, "MTZ-sbpo"),
                                                                                          w(IloArray<IloNumVarArray>(env, instance.n)),
                                                                                          t(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
                                                                                          pi(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),

@@ -28,13 +28,16 @@
 #include "models/WSN_flow_model_2_1_base.h"
 #include "models/WSN_flow_model_2_1_sbc.h"
 #include "models/WSN_flow_model_3_base.h"
-#include "models/WSN_flow_model_3_des.h"
+#include "models/WSN_flow_model_3.h"
 
 #include "models/WSN_flow_model_3_check_instance.h"
-#include "models/WSN_arvore_rotulada_model_base.h"
+
+#include "models/WSN_arvore_rotulada_model_mtz.h"
+#include "models/WSN_arvore_rotulada_model_flow.h"
 
 #include "models/WSN_mcf_weight_arc.h"
-#include "models/WSN_repr_model_base.h"
+#include "models/WSN_repr_model_flow.h"
+#include "models/WSN_repr_model_mtz.h"
 
 
 /**
@@ -55,8 +58,10 @@ std::unique_ptr<ModelRunner<WSN>> initialize_all_models(WSN_data &instance)
     (*model_runner).insert_model(WSN_flow_model_2_1(instance), "FlowModel2-1");
     (*model_runner).insert_model(WSN_flow_model_2_1_sbc(instance), "FlowModel2-1-sbc");
 
+    // #################### Tree weight as flow ##################
     (*model_runner).insert_model(WSN_flow_model_3_base(instance), "FlowModel3-base");
-    (*model_runner).insert_model(WSN_flow_model_3_des(instance), "FlowModel3-des");
+    (*model_runner).insert_model(WSN_flow_model_3_valid_ineq(instance), "FlowModel3-valid-ineq");
+    (*model_runner).insert_model(WSN_flow_model_3_testing_ineq(instance), "FlowModel3-testing-ineq");
     (*model_runner).insert_model(WSN_flow_model_3_check_instance(instance), "check-instance");
 
     // ####################### MTZ Models #######################
@@ -76,9 +81,20 @@ std::unique_ptr<ModelRunner<WSN>> initialize_all_models(WSN_data &instance)
     (*model_runner).insert_model(WSN_mcf_model(instance), "MCFModel");
     
     (*model_runner).insert_model(WSN_mcf_model_weight_on_node(instance), "MCFModel-weight-node");
-    (*model_runner).insert_model(WSN_arvore_rotulada_model_base(instance), "MAR-base");
     (*model_runner).insert_model(WSN_mcf_weight_arc_model(instance), "MCF-weight-arc-Model");
-    (*model_runner).insert_model(WSN_representante_model_base(instance), "REPR-base");
+
+    // ###################### Proxy Models ######################
+    (*model_runner).insert_model(WSN_repr_model_flow_base(instance), "REPR-flow-base");
+    (*model_runner).insert_model(WSN_repr_model_flow(instance), "REPR-flow");
+    (*model_runner).insert_model(WSN_repr_model_mtz_base(instance), "REPR-mtz-base");
+    (*model_runner).insert_model(WSN_repr_model_mtz(instance), "REPR-mtz");
+
+    // ####################### MAR Models #######################
+    (*model_runner).insert_model(WSN_arv_rot_model_mtz_base(instance), "MAR-mtz-base");
+    (*model_runner).insert_model(WSN_arv_rot_model_mtz(instance), "MAR-mtz");
+    (*model_runner).insert_model(WSN_arv_rot_model_flow_base(instance), "MAR-flow-base");
+    (*model_runner).insert_model(WSN_arv_rot_model_flow(instance), "MAR-flow");
+    
 
     return model_runner;
 }

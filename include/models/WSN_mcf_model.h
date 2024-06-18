@@ -49,5 +49,5 @@ inline void WSN_mcf_model::build_model()
 void WSN_mcf_model::set_params_cplex(IloCplex &cplex)
 {
     WSN::set_params_cplex(cplex);
-    cplex.setParam(IloCplex::Param::Benders::Strategy, 3);
+    // cplex.setParam(IloCplex::Param::Benders::Strategy, 3);
 }
