@@ -34,6 +34,8 @@ protected:
     void add_CastroAndrade2023_valid_inequalities();
     void add_adasme2023_valid_inequalities();
     void add_mcf_valid_inequalities();
+    void add_remove_symmetries();
+    void add_conservation_inequalities_assignment();
 
     virtual IloModel create_relaxed();
 
@@ -102,6 +104,8 @@ inline void WSN_mcf_weight_model_base::build_model()
     add_CastroAndrade2023_valid_inequalities();
     add_adasme2023_valid_inequalities();
     add_mcf_valid_inequalities();
+    add_remove_symmetries();
+    add_conservation_inequalities_assignment();
 
     add_objective_function();
 }
@@ -185,6 +189,24 @@ inline void WSN_mcf_weight_model_base::add_ahani2019_mcf_constraints()
         clear_expr();
     }
 
+// force to zero variables 
+    for (int k = 0; k < instance.number_trees; k++)
+    {
+        for (int l = 0; l < instance.number_trees; l++)
+        {
+            if (l != k)
+            {
+                for (int v = 0; v < instance.n; v++)
+                {
+                    expr += x_sink[k][instance.n + l][v];
+                }
+
+                constraints.add(expr == 0);
+                clear_expr();
+            }
+        }
+    }
+
     // constraints.add(expr == instance.number_trees);
     // clear_expr();
 
@@ -236,28 +258,6 @@ inline void WSN_mcf_weight_model_base::add_ahani2019_mcf_constraints()
             }
 
             constraints.add(expr == 0);
-            clear_expr();
-        }
-    }
-
-    // flow conservation of number of nodes and limits
-    for (int s = 0; s < instance.number_trees; s++)
-    {
-        for (int v = 0; v < instance.n; v++)
-        {
-            expr += x_sink[s][instance.n + s][v];
-
-            for (auto &from : instance.adj_list_to_v[v])
-            {
-                expr += x_sink[s][from][v];
-            }
-
-            for (auto &to : instance.adj_list_from_v[v])
-            {
-                expr -= x_sink[s][v][to];
-            }
-
-            constraints.add(expr <= (y_sink[s][v] + z_sink[s][v]));
             clear_expr();
         }
     }
@@ -388,7 +388,7 @@ inline void WSN_mcf_weight_model_base::add_mcf_valid_inequalities()
 
         for (int k = 0; k < instance.number_trees; k++)
         {
-            constraints.add(x_sink[k][instance.n][i] <= y_sink[k][i]);
+            constraints.add(x_sink[k][instance.n + k][i] <= y_sink[k][i]);
         }
     }
 
@@ -401,6 +401,72 @@ inline void WSN_mcf_weight_model_base::add_mcf_valid_inequalities()
             {
                 constraints.add(x_sink[k][i][j] + x_sink[k][j][i] <= (y_sink[k][j] + z_sink[k][j])); // check this for every arc
             }
+        }
+    }
+}
+
+inline void WSN_mcf_weight_model_base::add_remove_symmetries()
+{
+    // adapted from work of Robertty
+    IloExpr expr(env);
+
+    // test_5
+    for (int k = 0; k < instance.number_trees; k++)
+    {
+        for (int v = 0; v < instance.n; v++)
+        {
+            for (int s = 0; s < k; s++)
+            {
+                for (int u = v + 1; u < instance.n; u++)
+                {
+                    expr += x_sink[s][instance.n + s][u];
+                }
+
+                for (int j = k; j < instance.number_trees; j++)
+                {
+                    expr -= x_sink[j][instance.n + j][v];
+                }
+
+                constraints.add(expr >= 0); // test_5
+
+                expr.end();
+                expr = IloExpr(env);
+            }
+        }
+    }
+
+    expr.end();
+}
+
+inline void WSN_mcf_weight_model_base::add_conservation_inequalities_assignment()
+{
+    // flow conservation of number of nodes and limits
+    IloExpr expr(env);
+
+    auto clear_expr = [&]
+    {
+        expr.end();
+        expr = IloExpr(env);
+    };
+
+    for (int s = 0; s < instance.number_trees; s++)
+    {
+        for (int v = 0; v < instance.n; v++)
+        {
+            expr += x_sink[s][instance.n + s][v];
+
+            for (auto &from : instance.adj_list_to_v[v])
+            {
+                expr += x_sink[s][from][v];
+            }
+
+            for (auto &to : instance.adj_list_from_v[v])
+            {
+                expr -= x_sink[s][v][to];
+            }
+
+            constraints.add(expr <= (y_sink[s][v] + z_sink[s][v]));
+            clear_expr();
         }
     }
 }
