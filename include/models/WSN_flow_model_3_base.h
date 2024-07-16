@@ -12,7 +12,7 @@ class WSN_flow_model_3_base : public WSN
 public:
     WSN_flow_model_3_base(WSN_data &instance);
 
-protected:
+// protected:
     virtual void build_model();
 
     IloArray<IloNumVarArray> f;

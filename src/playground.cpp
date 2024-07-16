@@ -142,7 +142,7 @@ void MyModel::build_model()
 
 int main()
 {
-    auto line = [](auto s)
+    auto line = [](auto s="~")
     {
         for (int i = 0; i < 60; i++)
         {
@@ -158,10 +158,16 @@ int main()
 
     line("-");
 
+    std::cout << ">>> ADD FUNCTIONS <<<" << std::endl;
+
     Part<Derived2> part(der2);
     part.addFunction("f", &Derived2::f);
     part.addFunction("g", &Derived2::g);
     part.addFunction("h", &Derived2::h);
+
+    line("-");
+
+    std::cout << ">>> RUN FUNCTIONS <<<" << std::endl;
 
     std::vector<std::string> abc({"f", "g", "h"});
 

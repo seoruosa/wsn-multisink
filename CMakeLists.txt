@@ -24,6 +24,7 @@ include_directories(include)
 
 add_executable(play src/playground.cpp)
 add_executable(all_models src/all_models.cpp)
+add_executable(run_model_part src/run_part_of_model.cpp)
 
 target_link_libraries(play 
                         PRIVATE ${CPLEX_LIBRARIES}
@@ -34,7 +35,13 @@ target_link_libraries(all_models
                         PRIVATE ${CPLEX_LIBRARIES}
                           )
 
+target_link_libraries(run_model_part 
+                          # PRIVATE utillib
+                          PRIVATE ${CPLEX_LIBRARIES}
+                            )                          
+
 target_include_directories(all_models PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
+target_include_directories(run_model_part PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 enable_testing()
 

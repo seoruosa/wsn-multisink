@@ -19,7 +19,7 @@ public:
     void solve(bool solve_relaxed = false);
     std::string name_model_instance();
 
-protected:
+// protected:
     virtual void build_model() = 0;
     std::string formulation_name;
     WSN_data &instance;
