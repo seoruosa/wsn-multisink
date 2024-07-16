@@ -2,6 +2,10 @@
 
 #include "WSN_mcf_model_base.h"
 
+/**
+ * @brief Multi-flow formulation where the flow is the weight of kth rooted tree
+ * 
+ */
 class WSN_mcf_model_testing : public WSN_mcf_model_base
 {
 public:
