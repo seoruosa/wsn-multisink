@@ -2,10 +2,14 @@
 
 #include "WSN.h"
 
-class WSN_mcf_model_base : public WSN
+/**
+ * @brief Multi-flow formulation where the flow is the weight of kth rooted tree
+ *
+ */
+class WSN_mcf_weight_model_base : public WSN
 {
 public:
-    WSN_mcf_model_base(WSN_data &instance);
+    WSN_mcf_weight_model_base(WSN_data &instance);
 
 protected:
     virtual void build_model();
@@ -17,6 +21,7 @@ protected:
     IloArray<IloNumVarArray> z_sink; // bridge sink assignment
 
     IloNumVar T;
+    int M;
 
     virtual void add_objective_function();
 
@@ -29,24 +34,52 @@ protected:
     void add_CastroAndrade2023_valid_inequalities();
     void add_adasme2023_valid_inequalities();
     void add_mcf_valid_inequalities();
+    void add_remove_symmetries();
+    void add_conservation_inequalities_assignment();
 
     virtual IloModel create_relaxed();
 
     virtual void print_full(IloCplex &cplex, std::ostream &cout);
 
     virtual void set_params_cplex(IloCplex &cplex);
+
+    double calculates_big_M();
 };
 
-WSN_mcf_model_base::WSN_mcf_model_base(WSN_data &instance) : WSN(instance, "MCF-Model-base"),
-                                                             T(IloNumVar(env, 0, IloInfinity, ILOFLOAT)),
-                                                             x_sink(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
-                                                             f_node(IloArray<IloArray<IloNumVarArray>>(env, instance.n)),
-                                                             y_sink(IloArray<IloNumVarArray>(env)),
-                                                             z_sink(IloArray<IloNumVarArray>(env))
+WSN_mcf_weight_model_base::WSN_mcf_weight_model_base(WSN_data &instance) : WSN(instance, "MCF-Model-weightAsFlow-base"),
+                                                                           T(IloNumVar(env, 0, IloInfinity, ILOFLOAT)),
+                                                                           x_sink(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
+                                                                           f_node(IloArray<IloArray<IloNumVarArray>>(env, instance.n)),
+                                                                           y_sink(IloArray<IloNumVarArray>(env)),
+                                                                           z_sink(IloArray<IloNumVarArray>(env)),
+                                                                           M(calculates_big_M())
 {
 }
 
-inline void WSN_mcf_model_base::build_model()
+inline void WSN_mcf_weight_model_base::add_objective_function()
+{
+    model.add(IloMinimize(env, T));
+
+    // constraint used to min-max the tree weight (not yet defined, now it's the forest weight)
+    IloExpr expr(env);
+
+    for (int k = 0; k < instance.number_trees; k++)
+    {
+        for (int i = 0; i < instance.n; i++)
+        {
+            expr += f_node[k][instance.n + k][i];
+        }
+
+        model.add(T >= expr);
+
+        expr.end();
+        expr = IloExpr(env);
+    }
+
+    expr.end();
+}
+
+inline void WSN_mcf_weight_model_base::build_model()
 {
     // basic model
     add_decision_variables();
@@ -67,47 +100,23 @@ inline void WSN_mcf_model_base::build_model()
 
     add_connect_sink_assignment_constraints();
 
-    // Valid inequalities
-    // add_CastroAndrade2023_valid_inequalities();
-    // add_adasme2023_valid_inequalities();
-    // add_mcf_valid_inequalities();
+    // // Valid inequalities
+    add_CastroAndrade2023_valid_inequalities();
+    add_adasme2023_valid_inequalities();
+    add_mcf_valid_inequalities();
+    add_remove_symmetries();
+    add_conservation_inequalities_assignment();
 
     add_objective_function();
 }
 
-void WSN_mcf_model_base::set_params_cplex(IloCplex &cplex)
+void WSN_mcf_weight_model_base::set_params_cplex(IloCplex &cplex)
 {
     WSN::set_params_cplex(cplex);
     // cplex.setParam(IloCplex::Param::Benders::Strategy, 3);
 }
 
-inline void WSN_mcf_model_base::add_objective_function()
-{
-
-    model.add(IloMinimize(env, T));
-
-    // constraint used to min-max the tree weight (not yet defined, now it's the forest weight)
-    IloExpr expr(env);
-
-    for (int k = 0; k < instance.number_trees; k++)
-    {
-        for (int i = 0; i < instance.n; i++)
-        {
-            for (auto &from : instance.adj_list_to_v[i])
-            {
-                expr += instance.weight[from][i] * x_sink[k][from][i];
-            }
-        }
-        model.add(T >= expr);
-
-        expr.end();
-        expr = IloExpr(env);
-    }
-
-    expr.end();
-}
-
-inline void WSN_mcf_model_base::add_flow_model_variables()
+inline void WSN_mcf_weight_model_base::add_flow_model_variables()
 {
     T.setName("T");
 
@@ -147,8 +156,7 @@ inline void WSN_mcf_model_base::add_flow_model_variables()
 
         for (int i = 0; i < instance.n + instance.number_trees; i++)
         {
-            f_node[k][i] = IloNumVarArray(env, instance.n + instance.number_trees, 0, 1, ILOFLOAT);
-            // f_node[k][i] = IloNumVarArray(env, instance.n + instance.number_trees, 0, 100000, ILOFLOAT);
+            f_node[k][i] = IloNumVarArray(env, instance.n + instance.number_trees, 0, M, ILOFLOAT);
 
             // Naming variables
             for (int j = 0; j < instance.n; j++)
@@ -159,7 +167,7 @@ inline void WSN_mcf_model_base::add_flow_model_variables()
     }
 }
 
-inline void WSN_mcf_model_base::add_ahani2019_mcf_constraints()
+inline void WSN_mcf_weight_model_base::add_ahani2019_mcf_constraints()
 {
     IloExpr expr(env);
 
@@ -174,12 +182,33 @@ inline void WSN_mcf_model_base::add_ahani2019_mcf_constraints()
     {
         for (int i = 0; i < instance.n; i++)
         {
-            expr += x_sink[k][instance.n][i];
+            expr += x_sink[k][instance.n + k][i];
+        }
+
+        constraints.add(expr == 1);
+        clear_expr();
+    }
+
+// force to zero variables 
+    for (int k = 0; k < instance.number_trees; k++)
+    {
+        for (int l = 0; l < instance.number_trees; l++)
+        {
+            if (l != k)
+            {
+                for (int v = 0; v < instance.n; v++)
+                {
+                    expr += x_sink[k][instance.n + l][v];
+                }
+
+                constraints.add(expr == 0);
+                clear_expr();
+            }
         }
     }
 
-    constraints.add(expr == instance.number_trees);
-    clear_expr();
+    // constraints.add(expr == instance.number_trees);
+    // clear_expr();
 
     // constraints 6 and 7
     for (int i = 0; i < instance.n; i++)
@@ -199,96 +228,36 @@ inline void WSN_mcf_model_base::add_ahani2019_mcf_constraints()
     {
         for (int k = 0; k < instance.number_trees; k++)
         {
-            constraints.add(x_sink[k][instance.n][i] <= (y_sink[k][i] + z_sink[k][i]));
+            constraints.add(x_sink[k][instance.n + k][i] <= (y_sink[k][i] + z_sink[k][i]));
         }
     }
 
-    // constraints 8
-    for (int k = 0; k < instance.number_trees; k++)
+    // flow conservation and limits
+    for (int s = 0; s < instance.number_trees; s++)
     {
-        for (int h = 0; h < instance.n; h++)
+        for (int v = 0; v < instance.n; v++)
         {
-            for (int j = 0; j < instance.n; j++)
+            expr += f_node[s][instance.n + s][v];
+            constraints.add(f_node[s][instance.n + s][v] <= M * x_sink[s][instance.n + s][v]);
+
+            for (auto &from : instance.adj_list_to_v[v])
             {
-                expr += f_node[h][instance.n][j];
+                expr += f_node[s][from][v];
+                expr -= instance.weight[from][v] * x_sink[s][from][v];
+
+                constraints.add(f_node[s][from][v] <= M * x_sink[s][from][v]);
+                constraints.add(f_node[s][from][v] >= instance.weight[from][v] * x_sink[s][from][v]);
             }
 
-            constraints.add(expr >= (y_sink[k][h] + z_sink[k][h]));
-            clear_expr();
-        }
-    }
-
-    // constraints 9
-    for (int h = 0; h < instance.n; h++)
-    {
-        for (auto &i : instance.adj_list_to_v[h])
-        {
-            expr += f_node[h][i][h];
-        }
-        expr += f_node[h][instance.n][h];
-        for (auto &j : instance.adj_list_from_v[h])
-        {
-            expr -= f_node[h][h][j];
-        }
-
-        constraints.add(expr == (y[h] + z[h]));
-        clear_expr();
-    }
-
-    // constraints 10
-    for (int h = 0; h < instance.n; h++)
-    {
-        for (int j = 0; j < instance.n; j++)
-        {
-            if (h != j)
+            for (auto &to : instance.adj_list_from_v[v])
             {
-                for (auto &i : instance.adj_list_to_v[j])
-                {
-                    expr += f_node[h][i][j];
-                }
-                expr += f_node[h][instance.n][j];
-                for (auto &i : instance.adj_list_from_v[j])
-                {
-                    expr -= f_node[h][j][i];
-                }
+                expr -= f_node[s][v][to];
 
-                constraints.add(expr == 0);
-                clear_expr();
+                constraints.add(f_node[s][v][to] <= M * x_sink[s][v][to]);
+                constraints.add(f_node[s][v][to] >= instance.weight[v][to] * x_sink[s][v][to]);
             }
-        }
-    }
 
-    // constraints 11
-    // só existe fluxo em um arco, caso este arco exista
-    for (int h = 0; h < instance.n; h++)
-    {
-        for (int i = 0; i < instance.n; i++)
-        {
-            for (auto &j : instance.adj_list_from_v[i])
-            {
-                for (int k = 0; k < instance.number_trees; k++)
-                {
-                    expr += x_sink[k][i][j];
-                }
-
-                // arcos de A
-                constraints.add(f_node[h][i][j] <= expr);
-                clear_expr();
-            }
-        }
-    }
-
-    // arcos que saem de um sink
-    for (int h = 0; h < instance.n; h++)
-    {
-        for (int j = 0; j < instance.n; j++)
-        {
-            for (int k = 0; k < instance.number_trees; k++)
-            {
-                expr += x_sink[k][instance.n][j];
-            }
-            constraints.add(f_node[h][instance.n][j] <= expr);
-
+            constraints.add(expr == 0);
             clear_expr();
         }
     }
@@ -296,7 +265,7 @@ inline void WSN_mcf_model_base::add_ahani2019_mcf_constraints()
     expr.end();
 }
 
-inline void WSN_mcf_model_base::add_connect_sink_assignment_constraints()
+inline void WSN_mcf_weight_model_base::add_connect_sink_assignment_constraints()
 {
     IloExpr expr_x(env);
     IloExpr expr_y(env);
@@ -344,7 +313,7 @@ inline void WSN_mcf_model_base::add_connect_sink_assignment_constraints()
     expr_z.end();
 }
 
-inline void WSN_mcf_model_base::add_CastroAndrade2023_valid_inequalities()
+inline void WSN_mcf_weight_model_base::add_CastroAndrade2023_valid_inequalities()
 {
     // Constraints from CastroAndrade2023
     for (int i = 0; i < instance.n; i++)
@@ -361,7 +330,7 @@ inline void WSN_mcf_model_base::add_CastroAndrade2023_valid_inequalities()
     }
 }
 
-inline void WSN_mcf_model_base::add_adasme2023_valid_inequalities()
+inline void WSN_mcf_weight_model_base::add_adasme2023_valid_inequalities()
 {
     // constraints Adasme2023
     for (int i = 0; i < instance.n; i++)
@@ -409,28 +378,9 @@ inline void WSN_mcf_model_base::add_adasme2023_valid_inequalities()
     }
 
     exp_ad_28.end();
-
-    IloExpr exp_ad_47(env);
-    for (int i = 0; i < instance.n; i++)
-    {
-        for (auto &from : instance.adj_list_to_v[i])
-        {
-            for (int h = 0; h < instance.n; h++)
-            {
-                exp_ad_47 += f_node[h][from][i];
-            }
-        }
-
-        // Constraints 47
-        constraints.add(2 * z[i] <= exp_ad_47);
-
-        exp_ad_47.end();
-        exp_ad_47 = IloExpr(env);
-    }
-    exp_ad_47.end();
 }
 
-void WSN_mcf_model_base::add_mcf_valid_inequalities()
+inline void WSN_mcf_weight_model_base::add_mcf_valid_inequalities()
 {
     // Constraints 50 (Adasme2023)
     for (int i = 0; i < instance.n; i++)
@@ -438,7 +388,7 @@ void WSN_mcf_model_base::add_mcf_valid_inequalities()
 
         for (int k = 0; k < instance.number_trees; k++)
         {
-            constraints.add(x_sink[k][instance.n][i] <= y_sink[k][i]);
+            constraints.add(x_sink[k][instance.n + k][i] <= y_sink[k][i]);
         }
     }
 
@@ -455,7 +405,73 @@ void WSN_mcf_model_base::add_mcf_valid_inequalities()
     }
 }
 
-inline IloModel WSN_mcf_model_base::create_relaxed()
+inline void WSN_mcf_weight_model_base::add_remove_symmetries()
+{
+    // adapted from work of Robertty
+    IloExpr expr(env);
+
+    // test_5
+    for (int k = 0; k < instance.number_trees; k++)
+    {
+        for (int v = 0; v < instance.n; v++)
+        {
+            for (int s = 0; s < k; s++)
+            {
+                for (int u = v + 1; u < instance.n; u++)
+                {
+                    expr += x_sink[s][instance.n + s][u];
+                }
+
+                for (int j = k; j < instance.number_trees; j++)
+                {
+                    expr -= x_sink[j][instance.n + j][v];
+                }
+
+                constraints.add(expr >= 0); // test_5
+
+                expr.end();
+                expr = IloExpr(env);
+            }
+        }
+    }
+
+    expr.end();
+}
+
+inline void WSN_mcf_weight_model_base::add_conservation_inequalities_assignment()
+{
+    // flow conservation of number of nodes and limits
+    IloExpr expr(env);
+
+    auto clear_expr = [&]
+    {
+        expr.end();
+        expr = IloExpr(env);
+    };
+
+    for (int s = 0; s < instance.number_trees; s++)
+    {
+        for (int v = 0; v < instance.n; v++)
+        {
+            expr += x_sink[s][instance.n + s][v];
+
+            for (auto &from : instance.adj_list_to_v[v])
+            {
+                expr += x_sink[s][from][v];
+            }
+
+            for (auto &to : instance.adj_list_from_v[v])
+            {
+                expr -= x_sink[s][v][to];
+            }
+
+            constraints.add(expr <= (y_sink[s][v] + z_sink[s][v]));
+            clear_expr();
+        }
+    }
+}
+
+inline IloModel WSN_mcf_weight_model_base::create_relaxed()
 {
     IloModel relaxed(WSN::create_relaxed());
 
@@ -468,7 +484,7 @@ inline IloModel WSN_mcf_model_base::create_relaxed()
     return relaxed;
 }
 
-void WSN_mcf_model_base::print_full(IloCplex &cplex, std::ostream &cout)
+inline void WSN_mcf_weight_model_base::print_full(IloCplex &cplex, std::ostream &cout)
 {
     WSN::print_full(cplex, cout);
 
@@ -483,4 +499,27 @@ void WSN_mcf_model_base::print_full(IloCplex &cplex, std::ostream &cout)
     auto [y_sink_full, y_sink_values] = read_full_matrix(y_sink, cplex, 1);
 
     print_matrix(y_sink_full, y_sink_values, "y_sink", cout);
+}
+
+double WSN_mcf_weight_model_base::calculates_big_M()
+{
+    double M_weight = 1.0;
+    std::vector<double> weights;
+
+    for (int i = 0; i < instance.n; i++)
+    {
+        for (auto &j : instance.adj_list_from_v[i])
+        {
+            weights.push_back(instance.weight[i][j]);
+        }
+    }
+
+    std::sort(weights.begin(), weights.end(), std::greater<double>());
+
+    for (int i = 0; i < (instance.n - instance.number_trees) && i < weights.size(); i++)
+    {
+        M_weight += weights[i];
+    }
+
+    return M_weight;
 }
