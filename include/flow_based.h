@@ -7,9 +7,11 @@
 #include <iostream>
 #include <chrono>
 
+#include <regex>
+
 /**
  * @brief Structure with necessary parameters from input
- * 
+ *
  */
 struct Run_Params
 {
@@ -18,11 +20,12 @@ struct Run_Params
     int number_sinks = 1;
     unsigned seed;
     bool relaxed = false;
+    std::vector<std::string> constraints = {};
 };
 
 /**
  * @brief Print a help message
- * 
+ *
  */
 void PrintHelp()
 {
@@ -48,14 +51,14 @@ void PrintHelp()
 
 /**
  * @brief Parse the arguments from program call
- * 
- * @param argc 
- * @param argv 
+ *
+ * @param argc
+ * @param argv
  * @return Run_Params is the structure with parsed arguments
  */
 Run_Params read_arguments(int argc, char **argv)
 {
-    const char *const short_opts = "K:ri:m:s:h";
+    const char *const short_opts = "K:ri:m:s:c:h";
     const option long_opts[] = {
         {"instance", required_argument, nullptr, 'i'},
         {"num-sinks", optional_argument, nullptr, 'K'},
@@ -63,6 +66,7 @@ Run_Params read_arguments(int argc, char **argv)
         {"model", optional_argument, nullptr, 'm'},
         {"seed", optional_argument, nullptr, 's'},
         {"help", no_argument, nullptr, 'h'},
+        {"constraints", optional_argument, nullptr, 'c'},
         {nullptr, no_argument, nullptr, 0}};
 
     std::string instance_path;
@@ -70,11 +74,32 @@ Run_Params read_arguments(int argc, char **argv)
     int number_sinks = 1;
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     bool relaxed = false;
+    std::vector<std::string> constraints({});
 
     while (true)
     {
         const auto opt = getopt_long(argc, argv, short_opts, long_opts, nullptr);
         bool model_is_valid = false;
+
+        auto read_constraints = [](auto optarg)
+        {
+            std::regex rgx("[-:\\w]+");
+            std::string string(optarg);
+
+            auto i = std::sregex_iterator(string.begin(), string.end(), rgx);
+            auto end = std::sregex_iterator();
+
+            std::vector<std::string> constraints_list({});
+
+            while (i != end)
+            {
+                auto match = *i++;
+
+                constraints_list.push_back(match.str());                
+            }
+
+            return constraints_list;
+        };
 
         if (-1 == opt)
             break;
@@ -100,6 +125,9 @@ Run_Params read_arguments(int argc, char **argv)
         case 's':
             seed = (optarg == NULL) ? seed : std::stoul(optarg);
             break;
+        case 'c':
+            constraints = read_constraints(optarg);
+            break;
         case 'h': // -h or --help
         case '?': // Unrecognized option
         default:
@@ -108,5 +136,5 @@ Run_Params read_arguments(int argc, char **argv)
         }
     }
 
-    return {instance_path, model, number_sinks, seed, relaxed};
+    return {instance_path, model, number_sinks, seed, relaxed, constraints};
 }

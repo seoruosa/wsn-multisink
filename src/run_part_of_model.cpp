@@ -39,9 +39,7 @@ int main(int argc, char *argv[])
         part.addFunction("o", &WSN_flow_model_3_base::add_leaf_constraints);
         // // part.addFunction("", &WSN_flow_model_3_base::);
 
-        std::vector<std::string> abc({"n", "o"});
-
-        part.create_model(abc);
+        part.create_model(params.constraints);
         part.solve(params.relaxed);
     }
     catch (IloException &e)
