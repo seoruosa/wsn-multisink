@@ -84,6 +84,13 @@ inline void PartModel<T>::operator()(std::string funcName)
     {
         (obj_ptr->*it->second)();
     }
+    else
+    {
+        std::ostringstream error_message;
+        error_message << "Constraint name don't exist in the map";
+
+        throw std::invalid_argument(error_message.str());
+    }
 }
 
 template <typename T>
