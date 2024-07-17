@@ -39,6 +39,7 @@ public:
     void add_CastroAndrade2023_valid_inequalities();
     void add_adasme2023_valid_inequalities();
     void add_testing_valid_inequalities();
+    void add_lower_bound_weight_2_levels();
 
     void add_remove_symmetries();
 
@@ -386,6 +387,38 @@ void WSN_flow_model_3_base::add_testing_valid_inequalities()
 
 
     expr.end();
+}
+
+inline void WSN_flow_model_3_base::add_lower_bound_weight_2_levels()
+{
+    IloExpr expr(env);
+
+    auto clear_expr = [&]
+    {
+        expr.end();
+        expr = IloExpr(env);
+    };
+
+    for (int u = 0; u < instance.n; u++)
+    {
+        for (auto &to : instance.adj_list_from_v[u])
+        {
+            expr += x[u][to]*instance.weight[u][to];
+
+            for (auto &v : instance.adj_list_from_v[to])
+            {
+                if (v != u)
+                {
+                    expr += x[to][v]*instance.weight[to][v];
+                }
+            }
+        }
+
+        constraints.add(T >= expr);
+        clear_expr();
+    }
+
+    expr.end();    
 }
 
 void WSN_flow_model_3_base::add_remove_symmetries()

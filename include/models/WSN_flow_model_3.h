@@ -42,7 +42,8 @@ void WSN_flow_model_3_testing_ineq::build_model()
     add_adasme2023_valid_inequalities();
     add_CastroAndrade2023_valid_inequalities();
     add_remove_symmetries();
-    add_testing_valid_inequalities();
+    // add_testing_valid_inequalities();
+    add_lower_bound_weight_2_levels();
 
     add_objective_function();
 }
