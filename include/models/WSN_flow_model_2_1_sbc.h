@@ -5,7 +5,7 @@
 /**
  * @brief Model WSN_flow_model_2_1_base modified to test constraints to break symmetries
  * and constraints to balance the number of clusters on solution.
- * 
+ *
  */
 class WSN_flow_model_2_1_sbc : public WSN_flow_model_2_1_base
 {
@@ -15,7 +15,7 @@ public:
 private:
     virtual void build_model();
 
-    IloArray<IloNumVarArray> z_node;            // master-sink assignment variable
+    IloArray<IloNumVarArray> z_node; // master-sink assignment variable
 
     void add_remove_symmetries_variables();
     void add_remove_symmetries();
@@ -30,12 +30,7 @@ private:
 };
 
 WSN_flow_model_2_1_sbc::WSN_flow_model_2_1_sbc(WSN_data &instance) : WSN_flow_model_2_1_base(instance),
-                                                                    //  f(IloArray<IloNumVarArray>(env, instance.n + instance.number_trees)),
-                                                                    //  l(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)), // Node current formulation
-                                                                    //  z_depot(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
                                                                      z_node(IloArray<IloNumVarArray>(env, instance.number_trees))
-                                                                    //  T(IloNumVar(env, 0, IloInfinity, ILOFLOAT)),
-                                                                    //  M(int(calculates_big_M()))
 {
     WSN::formulation_name = "FlowModel2-1-sbc-test";
 }

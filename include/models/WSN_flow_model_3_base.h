@@ -306,16 +306,12 @@ inline void WSN_flow_model_3_base::add_adasme2023_valid_inequalities()
     {
         if (instance.adj_list_to_v[i].size() == 1)
         {
-            // constraint 19
-            // constraints.add(z[i] == 0);
-
             for (auto &from : instance.adj_list_to_v[i])
             {
                 // constraint 20
                 constraints.add(y[from] + y[i] == 1);
 
                 // constraint 21
-                // constraints.add(2 * z[from] <= y[i] + x[from][i]);
                 constraints.add(2 * (x[from][i] + x[i][from]) <= y[i] + z[from]);
             }
         }
