@@ -148,7 +148,6 @@ inline void WSN_mcf_model_base::add_flow_model_variables()
         for (int i = 0; i < instance.n + instance.number_trees; i++)
         {
             f_node[k][i] = IloNumVarArray(env, instance.n + instance.number_trees, 0, 1, ILOFLOAT);
-            // f_node[k][i] = IloNumVarArray(env, instance.n + instance.number_trees, 0, 100000, ILOFLOAT);
 
             // Naming variables
             for (int j = 0; j < instance.n; j++)

@@ -6,7 +6,6 @@ class WSN_flow_model_2_1 : public WSN_flow_model_2_1_base
 {
 public:
     WSN_flow_model_2_1(WSN_data &instance);
-    // ~WSN_flow_model_2_1() { WSN_flow_model_2_1_base::~WSN_flow_model_2_1_base(); };
     virtual void build_model();
 };
 

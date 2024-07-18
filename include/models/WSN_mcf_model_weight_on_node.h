@@ -396,12 +396,6 @@ inline void WSN_mcf_model_weight_on_node::add_CastroAndrade2023_valid_inequaliti
             // constraint 16 and 17
             constraints.add(x[i][j] <= z[i] + z[j]);
             constraints.add(x[i][j] <= y[i] + y[j]);
-
-            // for (int k = 0; k < instance.number_trees; k++)
-            // {
-            //     constraints.add(x_sink[k][i][j] <= z_sink[k][i] + z_sink[k][j]);
-            //     constraints.add(x_sink[k][i][j] <= y_sink[k][i] + y_sink[k][j]);
-            // }
         }
     }
 }
@@ -420,10 +414,6 @@ inline void WSN_mcf_model_weight_on_node::add_adasme2023_valid_inequalities()
             {
                 // constraint 20
                 constraints.add(y[from] + y[i] == 1);
-
-                // constraint 21
-                // constraints.add(2 * z[from] <= y[i] + x[from][i]);
-                // constraints.add(2 * (x[from][i] + x[i][from]) <= y[i] + z[from]);
             }
         }
     }
@@ -477,57 +467,6 @@ inline void WSN_mcf_model_weight_on_node::add_adasme2023_valid_inequalities()
         exp_ad_47 = IloExpr(env);
     }
     exp_ad_47.end();
-
-    // IloExpr exp_ad_48(env);
-    // for (int i = 0; i < instance.n; i++)
-    // {
-    //     for (auto &j : instance.adj_list_from_v[i])
-    //     {
-    //         for (int h = 0; h < instance.n; h++)
-    //         {
-    //             exp_ad_48 += f_node[h][i][j];
-    //         }
-
-    //         // Constraints 48
-    //         constraints.add(2 * x[i][j] - z[i] <= exp_ad_48);
-
-    //         exp_ad_48.end();
-    //         exp_ad_48 = IloExpr(env);
-    //     }
-    // }
-    // exp_ad_48.end();
-
-    // IloExpr exp_ad_49(env);
-    // IloExpr exp_ad_49_1(env);
-    // for (int i = 0; i < instance.n; i++)
-    // {
-    //     for (int h = 0; h < instance.n; h++)
-    //     {
-    //         for (auto &from : instance.adj_list_to_v[i])
-    //         {
-    //             exp_ad_49 += f_node[h][from][i];
-    //         }
-    //         exp_ad_49 += f_node[h][instance.n][i];
-    //     }
-
-    //     for (auto &j : instance.adj_list_from_v[i])
-    //     {
-    //         for (int h = 0; h < instance.n; h++)
-    //         {
-    //             exp_ad_49_1 += f_node[h][i][j];
-    //         }
-    //         // Constraints 49
-    //         constraints.add(exp_ad_49_1 + x[i][j] * (instance.n - 1) - exp_ad_49 <= instance.n - 2);
-
-    //         exp_ad_49_1.end();
-    //         exp_ad_49_1 = IloExpr(env);
-    //     }
-
-    //     exp_ad_49.end();
-    //     exp_ad_49 = IloExpr(env);
-    // }
-    // exp_ad_49.end();
-    // exp_ad_49_1.end();
 }
 
 void WSN_mcf_model_weight_on_node::add_mcf_valid_inequalities()
@@ -553,8 +492,6 @@ void WSN_mcf_model_weight_on_node::add_mcf_valid_inequalities()
             }
         }
     }
-
-
 }
 
 inline void WSN_mcf_model_weight_on_node::add_calculate_weight_tree_constraints()
