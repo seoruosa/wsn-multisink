@@ -80,9 +80,10 @@ std::unique_ptr<ModelRunner<WSN>> initialize_all_models(WSN_data &instance)
     (*model_runner).insert_model(WSN_mcf_model_castro2023(instance), "MCFModel-castro2023");
     (*model_runner).insert_model(WSN_mcf_model_adasme2023(instance), "MCFModel-adasme2023");
     (*model_runner).insert_model(WSN_mcf_model(instance), "MCFModel");
-    (*model_runner).insert_model(WSN_mcf_weight_model_base(instance), "MCFModel-weightAsFlow-base");
-    
     (*model_runner).insert_model(WSN_mcf_model_weight_on_node(instance), "MCFModel-weight-node");
+
+    // ----------------------- Alternative flows ----------------
+    (*model_runner).insert_model(WSN_mcf_weight_model_base(instance), "MCFModel-weightAsFlow-base");
     (*model_runner).insert_model(WSN_mcf_weight_arc_model(instance), "MCF-weight-arc-Model");
 
     // ###################### Proxy Models ######################
