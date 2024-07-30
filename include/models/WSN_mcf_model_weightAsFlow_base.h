@@ -15,7 +15,7 @@ protected:
     virtual void build_model();
 
     IloArray<IloArray<IloNumVarArray>> x_sink; // arc-sink assignment
-    IloArray<IloArray<IloNumVarArray>> f_node; // flow of commodity h (node h) along arc (i, j)
+    IloArray<IloArray<IloNumVarArray>> f_sink; // flow of commodity h (sink s) along arc (i, j)
 
     IloArray<IloNumVarArray> y_sink; // master sink assignment
     IloArray<IloNumVarArray> z_sink; // bridge sink assignment
@@ -49,7 +49,7 @@ protected:
 WSN_mcf_weight_model_base::WSN_mcf_weight_model_base(WSN_data &instance) : WSN(instance, "MCF-Model-weightAsFlow-base"),
                                                                            T(IloNumVar(env, 0, IloInfinity, ILOFLOAT)),
                                                                            x_sink(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
-                                                                           f_node(IloArray<IloArray<IloNumVarArray>>(env, instance.n)),
+                                                                           f_sink(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
                                                                            y_sink(IloArray<IloNumVarArray>(env)),
                                                                            z_sink(IloArray<IloNumVarArray>(env)),
                                                                            M(calculates_big_M())
@@ -67,7 +67,7 @@ inline void WSN_mcf_weight_model_base::add_objective_function()
     {
         for (int i = 0; i < instance.n; i++)
         {
-            expr += f_node[k][instance.n + k][i];
+            expr += f_sink[k][instance.n + k][i];
         }
 
         model.add(T >= expr);
@@ -150,18 +150,18 @@ inline void WSN_mcf_weight_model_base::add_flow_model_variables()
     }
 
     // Creating arrays
-    for (int k = 0; k < instance.n; k++)
+    for (int k = 0; k < instance.number_trees; k++)
     {
-        f_node[k] = IloArray<IloNumVarArray>(env, instance.n + instance.number_trees);
+        f_sink[k] = IloArray<IloNumVarArray>(env, instance.n + instance.number_trees);
 
         for (int i = 0; i < instance.n + instance.number_trees; i++)
         {
-            f_node[k][i] = IloNumVarArray(env, instance.n + instance.number_trees, 0, M, ILOFLOAT);
+            f_sink[k][i] = IloNumVarArray(env, instance.n + instance.number_trees, 0, M, ILOFLOAT);
 
             // Naming variables
             for (int j = 0; j < instance.n; j++)
             {
-                f_node[k][i][j].setName(("f_node(" + std::to_string(k) + ")(" + std::to_string(i) + ")(" + std::to_string(j) + ")").c_str());
+                f_sink[k][i][j].setName(("f_sink(" + std::to_string(k) + ")(" + std::to_string(i) + ")(" + std::to_string(j) + ")").c_str());
             }
         }
     }
@@ -207,9 +207,6 @@ inline void WSN_mcf_weight_model_base::add_ahani2019_mcf_constraints()
         }
     }
 
-    // constraints.add(expr == instance.number_trees);
-    // clear_expr();
-
     // constraints 6 and 7
     for (int i = 0; i < instance.n; i++)
     {
@@ -237,24 +234,24 @@ inline void WSN_mcf_weight_model_base::add_ahani2019_mcf_constraints()
     {
         for (int v = 0; v < instance.n; v++)
         {
-            expr += f_node[s][instance.n + s][v];
-            constraints.add(f_node[s][instance.n + s][v] <= M * x_sink[s][instance.n + s][v]);
+            expr += f_sink[s][instance.n + s][v];
+            constraints.add(f_sink[s][instance.n + s][v] <= M * x_sink[s][instance.n + s][v]);
 
             for (auto &from : instance.adj_list_to_v[v])
             {
-                expr += f_node[s][from][v];
+                expr += f_sink[s][from][v];
                 expr -= instance.weight[from][v] * x_sink[s][from][v];
 
-                constraints.add(f_node[s][from][v] <= M * x_sink[s][from][v]);
-                constraints.add(f_node[s][from][v] >= instance.weight[from][v] * x_sink[s][from][v]);
+                constraints.add(f_sink[s][from][v] <= M * x_sink[s][from][v]);
+                constraints.add(f_sink[s][from][v] >= instance.weight[from][v] * x_sink[s][from][v]);
             }
 
             for (auto &to : instance.adj_list_from_v[v])
             {
-                expr -= f_node[s][v][to];
+                expr -= f_sink[s][v][to];
 
-                constraints.add(f_node[s][v][to] <= M * x_sink[s][v][to]);
-                constraints.add(f_node[s][v][to] >= instance.weight[v][to] * x_sink[s][v][to]);
+                constraints.add(f_sink[s][v][to] <= M * x_sink[s][v][to]);
+                constraints.add(f_sink[s][v][to] >= instance.weight[v][to] * x_sink[s][v][to]);
             }
 
             constraints.add(expr == 0);
@@ -479,7 +476,7 @@ inline IloModel WSN_mcf_weight_model_base::create_relaxed()
     relaxed = relax_utils::relax_2_index(relaxed, z_sink);
 
     relaxed = relax_utils::relax_3_index(relaxed, x_sink);
-    relaxed = relax_utils::relax_3_index(relaxed, f_node);
+    relaxed = relax_utils::relax_3_index(relaxed, f_sink);
 
     return relaxed;
 }
@@ -492,9 +489,9 @@ inline void WSN_mcf_weight_model_base::print_full(IloCplex &cplex, std::ostream 
 
     print_matrix(x_sink_full, x_sink_values, "x_sink", cout);
 
-    auto [f_node_full, f_node_values] = read_matrix_3d(f_node, cplex, 1);
+    auto [f_node_full, f_node_values] = read_matrix_3d(f_sink, cplex, 1);
 
-    print_matrix(f_node_full, f_node_values, "f_node", cout);
+    print_matrix(f_node_full, f_node_values, "f_sink", cout);
 
     auto [y_sink_full, y_sink_values] = read_full_matrix(y_sink, cplex, 1);
 
