@@ -20,6 +20,7 @@ struct Run_Params
     int number_sinks = 1;
     unsigned seed;
     bool relaxed = false;
+    float bigM = -1.0f;
     std::vector<std::string> constraints = {};
 
     friend std::ostream &operator<<(std::ostream &os, const Run_Params &o)
@@ -29,6 +30,10 @@ struct Run_Params
         os << "sinks: " << o.number_sinks << std::endl;
         os << "seed: " << o.seed << std::endl;
         os << "relaxed: " << (o.relaxed ? "yes" : "no") << std::endl;
+        if (o.bigM > 0)
+        {
+            os << "bigM: " << o.bigM << std::endl;
+        }
         if (!o.constraints.empty())
         {
             os << "constraints: ";
@@ -66,6 +71,7 @@ void PrintHelp()
                  "-K, --num-sinks <n>:       Number of sinks\n"
                  "-m, --model [model_name]:       choosen model\n"
                  "-c, --constraints [constr_list]:      list of constraints\n"
+                 "-B, --bigM [value]:       Big M to be passed to model\n"
                  "-h, --help:                Show help\n";
     exit(1);
 }
@@ -79,7 +85,7 @@ void PrintHelp()
  */
 Run_Params read_arguments(int argc, char **argv)
 {
-    const char *const short_opts = "K:ri:m:s:c:h";
+    const char *const short_opts = "K:ri:m:s:c:B:h";
     const option long_opts[] = {
         {"instance", required_argument, nullptr, 'i'},
         {"num-sinks", optional_argument, nullptr, 'K'},
@@ -88,6 +94,7 @@ Run_Params read_arguments(int argc, char **argv)
         {"seed", optional_argument, nullptr, 's'},
         {"help", no_argument, nullptr, 'h'},
         {"constraints", optional_argument, nullptr, 'c'},
+        {"bigM", optional_argument, nullptr, 'B'},
         {nullptr, no_argument, nullptr, 0}};
 
     std::string instance_path;
@@ -95,6 +102,7 @@ Run_Params read_arguments(int argc, char **argv)
     int number_sinks = 1;
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     bool relaxed = false;
+    float bigM = -1.0f;
     std::vector<std::string> constraints({});
 
     while (true)
@@ -149,6 +157,9 @@ Run_Params read_arguments(int argc, char **argv)
         case 'c':
             constraints = read_constraints(optarg);
             break;
+        case 'B':
+            bigM = (optarg == NULL) ? bigM : std::stof(optarg);
+            break;
         case 'h': // -h or --help
         case '?': // Unrecognized option
         default:
@@ -157,5 +168,5 @@ Run_Params read_arguments(int argc, char **argv)
         }
     }
 
-    return {instance_path, model, number_sinks, seed, relaxed, constraints};
+    return {instance_path, model, number_sinks, seed, relaxed, bigM, constraints};
 }
