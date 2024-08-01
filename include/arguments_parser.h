@@ -45,6 +45,7 @@ void PrintHelp()
                  "-r, --relaxed:              Solve the relaxed version of model\n"
                  "-K, --num-sinks <n>:       Number of sinks\n"
                  "-m, --model [model_name]:       choosen model\n"
+                 "-c, --constraints [constr_list]:      list of constraints\n"
                  "-h, --help:                Show help\n";
     exit(1);
 }
