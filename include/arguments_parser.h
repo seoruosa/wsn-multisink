@@ -21,6 +21,26 @@ struct Run_Params
     unsigned seed;
     bool relaxed = false;
     std::vector<std::string> constraints = {};
+
+    friend std::ostream &operator<<(std::ostream &os, const Run_Params &o)
+    {
+        os << "path: " << o.instance_path << std::endl;
+        os << "model: " << o.model << std::endl;
+        os << "sinks: " << o.number_sinks << std::endl;
+        os << "seed: " << o.seed << std::endl;
+        os << "relaxed: " << (o.relaxed ? "yes" : "no") << std::endl;
+        if (!o.constraints.empty())
+        {
+            os << "constraints: ";
+            for (int i = 0; i < o.constraints.size() - 1; i++)
+            {
+                os << o.constraints[i] << ", ";
+            }
+            os << o.constraints.back() << std::endl;
+        }
+
+        return os;
+    };
 };
 
 /**
@@ -96,7 +116,7 @@ Run_Params read_arguments(int argc, char **argv)
             {
                 auto match = *i++;
 
-                constraints_list.push_back(match.str());                
+                constraints_list.push_back(match.str());
             }
 
             return constraints_list;
