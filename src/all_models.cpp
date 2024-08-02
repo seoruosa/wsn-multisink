@@ -18,8 +18,17 @@ int main(int argc, char *argv[])
         std::cout << params.instance_path << " | K: " << params.number_sinks << "   " << std::endl;
         std::cout << "n:" << instance.n << std::endl;
 
-        std::unique_ptr<ModelRunner<WSN>> model_runner = initialize_all_models(instance);
-        
+        std::unique_ptr<ModelRunner<WSN>> model_runner;
+
+        if (params.upper_bound > 0)
+        {
+            model_runner = initialize_all_models(instance);
+        }
+        else
+        {
+            model_runner = initialize_all_models(instance, params.upper_bound);
+        }
+
         (*model_runner).run_model(params.model, params.relaxed);
     }
     catch (IloException &e)
