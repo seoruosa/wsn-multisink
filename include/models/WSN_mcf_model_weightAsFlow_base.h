@@ -20,7 +20,6 @@ protected:
     IloArray<IloNumVarArray> y_sink; // master sink assignment
     IloArray<IloNumVarArray> z_sink; // bridge sink assignment
 
-    IloNumVar T;
     double M;
 
     virtual void add_objective_function();
@@ -47,7 +46,6 @@ protected:
 };
 
 WSN_mcf_weight_model_base::WSN_mcf_weight_model_base(WSN_data &instance) : WSN(instance, "MCF-Model-weightAsFlow-base"),
-                                                                           T(IloNumVar(env, 0, IloInfinity, ILOFLOAT)),
                                                                            x_sink(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
                                                                            f_sink(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
                                                                            y_sink(IloArray<IloNumVarArray>(env)),

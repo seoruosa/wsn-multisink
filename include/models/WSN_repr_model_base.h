@@ -18,7 +18,6 @@ protected:
     IloArray<IloNumVarArray> y_sink; // master sink assignment
     IloArray<IloNumVarArray> z_sink; // bridge sink assignment
 
-    IloNumVar T;
     IloArray<IloNumVarArray> f;
 
     int p;
@@ -60,7 +59,6 @@ protected:
 };
 
 WSN_representante_model_base::WSN_representante_model_base(WSN_data &instance) : WSN(instance, "REPR-base"),
-                                                                                 T(IloNumVar(env, 0, IloInfinity, ILOFLOAT)),
                                                                                  x_sink(IloArray<IloArray<IloNumVarArray>>(env, instance.n)),
                                                                                  y_sink(IloArray<IloNumVarArray>(env)),
                                                                                  z_sink(IloArray<IloNumVarArray>(env)),

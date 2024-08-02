@@ -16,8 +16,6 @@ protected:
 
     IloArray<IloArray<IloNumVarArray>> z_depot; // arc-depot assignment
 
-    IloNumVar T;
-
     double M;
 
     virtual void add_objective_function();
@@ -55,7 +53,6 @@ WSN_flow_model_2_1_base::WSN_flow_model_2_1_base(WSN_data &instance) : WSN(insta
                                                                        f(IloArray<IloNumVarArray>(env, instance.n + instance.number_trees)),
                                                                        l(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)), // Node current formulation
                                                                        z_depot(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
-                                                                       T(IloNumVar(env, 0, IloInfinity, ILOFLOAT)),
                                                                        M(calculates_big_M())
 {
 }

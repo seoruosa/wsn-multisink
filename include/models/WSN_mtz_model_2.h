@@ -16,7 +16,6 @@ private:
     IloArray<IloNumVarArray> w;
     IloNumVarArray t;
     IloNumVarArray pi;
-    IloNumVar T;
 
     int p;
     double M;
@@ -49,7 +48,6 @@ WSN_mtz_model_2::WSN_mtz_model_2(WSN_data &instance) : WSN(instance, "MTZModelSt
                                                        w(IloArray<IloNumVarArray>(env, instance.n)),
                                                        t(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
                                                        pi(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
-                                                       T(IloNumVar(env, 0, IloInfinity, ILOFLOAT)),
                                                        p((instance.n - instance.number_trees + 1) / 2),
                                                        M(calculates_big_M())
 {

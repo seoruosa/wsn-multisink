@@ -16,8 +16,6 @@ private:
     IloNumVarArray t;
     IloNumVarArray l; // Node current formulation
 
-    IloNumVar T;
-
     double M;
 
     virtual void add_objective_function();
@@ -53,7 +51,6 @@ WSN_flow_model_1::WSN_flow_model_1(WSN_data &instance) : WSN(instance, "FlowMode
                                                          w_a(IloArray<IloNumVarArray>(env, instance.n + instance.number_trees)),
                                                          t(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
                                                          l(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)), // Node current formulation
-                                                         T(IloNumVar(env, 0, IloInfinity, ILOFLOAT)),
                                                          M(calculates_big_M())
 {
 }

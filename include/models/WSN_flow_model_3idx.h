@@ -9,13 +9,11 @@ class WSN_flow_model_3idx : public WSN
 {
 public:
     WSN_flow_model_3idx(WSN_data &instance);
-    // ~WSN_flow_model_3idx();
 
 private:
     virtual void build_model();
     IloArray<IloArray<IloNumVarArray>> f_depot; // flow formulation with 3 index
     IloArray<IloArray<IloNumVarArray>> z_depot; // arc-depot assignment
-    IloNumVar T;
 
     virtual void add_objective_function();
 
@@ -34,14 +32,9 @@ private:
 
 WSN_flow_model_3idx::WSN_flow_model_3idx(WSN_data &instance) : WSN(instance, "FlowModel3Index"),
                                                                f_depot(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
-                                                               z_depot(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
-                                                               T(IloNumVar(env, 0, IloInfinity, ILOFLOAT))
+                                                               z_depot(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees))
 {
 }
-
-// WSN_flow_model_3idx::~WSN_flow_model_3idx()
-// {
-// }
 
 inline void WSN_flow_model_3idx::build_model()
 {
