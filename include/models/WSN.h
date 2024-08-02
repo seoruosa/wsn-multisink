@@ -74,6 +74,9 @@ public:
     // create decision variables and add basic model constraints
     void create_basic_model_constraints();
 
+    // add a upper bound to the model
+    void add_upper_bound_constraint();
+
     // returns a copy of actual model with a relaxation of the integer variables
     virtual IloModel create_relaxed();
 
@@ -333,6 +336,11 @@ void WSN::create_basic_model_constraints()
     add_bridge_master_neighbor_constraints();
 
     add_trivial_tree_constraints();
+}
+
+inline void WSN::add_upper_bound_constraint()
+{
+    constraints.add(T <= upper_bound);
 }
 
 std::string WSN::name_model_instance()
