@@ -9,6 +9,7 @@ class WSN_representante_model_base : public WSN
 {
 public:
     WSN_representante_model_base(WSN_data &instance);
+    WSN_representante_model_base(WSN_data &instance, double upper_bound);
 
 protected:
     virtual void build_model();
@@ -59,6 +60,17 @@ protected:
 };
 
 WSN_representante_model_base::WSN_representante_model_base(WSN_data &instance) : WSN(instance, "REPR-base"),
+                                                                                 x_sink(IloArray<IloArray<IloNumVarArray>>(env, instance.n)),
+                                                                                 y_sink(IloArray<IloNumVarArray>(env)),
+                                                                                 z_sink(IloArray<IloNumVarArray>(env)),
+                                                                                 f(IloArray<IloNumVarArray>(env, instance.n + instance.number_trees)),
+                                                                                 p((instance.n - instance.number_trees)),
+                                                                                 pi(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT))
+{
+}
+
+WSN_representante_model_base::WSN_representante_model_base(WSN_data &instance,
+                                                           double upper_bound) : WSN(instance, "REPR-base", upper_bound),
                                                                                  x_sink(IloArray<IloArray<IloNumVarArray>>(env, instance.n)),
                                                                                  y_sink(IloArray<IloNumVarArray>(env)),
                                                                                  z_sink(IloArray<IloNumVarArray>(env)),

@@ -6,6 +6,7 @@ class WSN_mcf_model_adasme2023 : public WSN_mcf_model_base
 {
 public:
     WSN_mcf_model_adasme2023(WSN_data &instance);
+    WSN_mcf_model_adasme2023(WSN_data &instance, double upper_bound);
 
 private:
     virtual void build_model() override;
@@ -16,6 +17,11 @@ WSN_mcf_model_adasme2023::WSN_mcf_model_adasme2023(WSN_data &instance) : WSN_mcf
     WSN::formulation_name = "MCF-Model-adasme2023";
 }
 
+WSN_mcf_model_adasme2023::WSN_mcf_model_adasme2023(WSN_data &instance,
+                                                   double upper_bound) : WSN_mcf_model_base(instance, upper_bound)
+{
+    WSN::formulation_name = "MCF-Model-adasme2023";
+}
 
 inline void WSN_mcf_model_adasme2023::build_model()
 {

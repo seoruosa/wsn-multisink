@@ -11,6 +11,7 @@ class WSN_flow_model_2_1_sbc : public WSN_flow_model_2_1_base
 {
 public:
     WSN_flow_model_2_1_sbc(WSN_data &instance);
+    WSN_flow_model_2_1_sbc(WSN_data &instance, double upper_bound);
 
 private:
     virtual void build_model();
@@ -30,6 +31,13 @@ private:
 };
 
 WSN_flow_model_2_1_sbc::WSN_flow_model_2_1_sbc(WSN_data &instance) : WSN_flow_model_2_1_base(instance),
+                                                                     z_node(IloArray<IloNumVarArray>(env, instance.number_trees))
+{
+    WSN::formulation_name = "FlowModel2-1-sbc-test";
+}
+
+WSN_flow_model_2_1_sbc::WSN_flow_model_2_1_sbc(WSN_data &instance,
+                                               double upper_bound) : WSN_flow_model_2_1_base(instance, upper_bound),
                                                                      z_node(IloArray<IloNumVarArray>(env, instance.number_trees))
 {
     WSN::formulation_name = "FlowModel2-1-sbc-test";

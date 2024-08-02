@@ -8,7 +8,7 @@ class WSN_mtz_castro_andrade_2023_sbpo : public WSN
     // Implementação do modelo do artigo CastroAndrade2023 da SBPO
 public:
     WSN_mtz_castro_andrade_2023_sbpo(WSN_data &instance);
-    // ~WSN_mtz_model_2();
+    WSN_mtz_castro_andrade_2023_sbpo(WSN_data &instance, double upper_bound);
 
 protected:
     virtual void build_model();
@@ -55,7 +55,16 @@ WSN_mtz_castro_andrade_2023_sbpo::WSN_mtz_castro_andrade_2023_sbpo(WSN_data &ins
                                                                                          pi(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
                                                                                          p((instance.n - instance.number_trees + 1) / 2),
                                                                                          M(calculates_big_M())
-//    M(100000)
+{
+}
+
+WSN_mtz_castro_andrade_2023_sbpo::WSN_mtz_castro_andrade_2023_sbpo(WSN_data &instance,
+                                                                   double upper_bound) : WSN(instance, "MTZ-sbpo", upper_bound),
+                                                                                         w(IloArray<IloNumVarArray>(env, instance.n)),
+                                                                                         t(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
+                                                                                         pi(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
+                                                                                         p((instance.n - instance.number_trees + 1) / 2),
+                                                                                         M(calculates_big_M())
 {
 }
 

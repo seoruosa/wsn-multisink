@@ -12,10 +12,11 @@ class WSN_flow_model_3_check_instance : public WSN_flow_model_3_base
 {
 public:
     WSN_flow_model_3_check_instance(WSN_data &instance);
+    WSN_flow_model_3_check_instance(WSN_data &instance, double upper_bound);
 
 private:
     IloNumVarArray t; // have a master as neighbor
-    
+
     virtual void build_model();
     virtual void add_objective_function();
 
@@ -27,6 +28,13 @@ private:
 };
 
 WSN_flow_model_3_check_instance::WSN_flow_model_3_check_instance(WSN_data &instance) : WSN_flow_model_3_base(instance),
+                                                                                       t(IloNumVarArray(env))
+{
+    WSN::formulation_name = "FlowModel3-checking-test";
+}
+
+WSN_flow_model_3_check_instance::WSN_flow_model_3_check_instance(WSN_data &instance,
+                                                                 double upper_bound) : WSN_flow_model_3_base(instance, upper_bound),
                                                                                        t(IloNumVarArray(env))
 {
     WSN::formulation_name = "FlowModel3-checking-test";
@@ -80,7 +88,7 @@ void WSN_flow_model_3_check_instance::add_objective_function()
 void WSN_flow_model_3_check_instance::add_check_model_variables()
 {
     t = IloNumVarArray(env, instance.n, 0, 1, ILOINT); // have a master as neighbor
-    
+
     // Naming variables
     for (int i = 0; i < instance.n; i++)
     {

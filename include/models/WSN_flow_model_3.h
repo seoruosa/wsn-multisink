@@ -6,12 +6,19 @@ class WSN_flow_model_3_testing_ineq : public WSN_flow_model_3_base
 {
 private:
     virtual void build_model();
-    
+
 public:
     WSN_flow_model_3_testing_ineq(WSN_data &instance);
+    WSN_flow_model_3_testing_ineq(WSN_data &instance, double upper_bound);
 };
 
 WSN_flow_model_3_testing_ineq::WSN_flow_model_3_testing_ineq(WSN_data &instance) : WSN_flow_model_3_base(instance)
+{
+    WSN::formulation_name = "FlowModel3-testing-ineq";
+}
+
+WSN_flow_model_3_testing_ineq::WSN_flow_model_3_testing_ineq(WSN_data &instance,
+                                                             double upper_bound) : WSN_flow_model_3_base(instance, upper_bound)
 {
     WSN::formulation_name = "FlowModel3-testing-ineq";
 }
@@ -52,12 +59,19 @@ class WSN_flow_model_3_valid_ineq : public WSN_flow_model_3_base
 {
 private:
     virtual void build_model();
-    
+
 public:
     WSN_flow_model_3_valid_ineq(WSN_data &instance);
+    WSN_flow_model_3_valid_ineq(WSN_data &instance, double upper_bound);
 };
 
 WSN_flow_model_3_valid_ineq::WSN_flow_model_3_valid_ineq(WSN_data &instance) : WSN_flow_model_3_base(instance)
+{
+    WSN::formulation_name = "FlowModel3-valid-ineq";
+}
+
+WSN_flow_model_3_valid_ineq::WSN_flow_model_3_valid_ineq(WSN_data &instance,
+                                                         double upper_bound) : WSN_flow_model_3_base(instance, upper_bound)
 {
     WSN::formulation_name = "FlowModel3-valid-ineq";
 }

@@ -8,7 +8,7 @@ class WSN_mtz_model_2_1 : public WSN
 {
 public:
     WSN_mtz_model_2_1(WSN_data &instance);
-    // ~WSN_mtz_model_2();
+    WSN_mtz_model_2_1(WSN_data &instance, double upper_bound);
 
 private:
     virtual void build_model();
@@ -50,6 +50,16 @@ private:
 };
 
 WSN_mtz_model_2_1::WSN_mtz_model_2_1(WSN_data &instance) : WSN(instance, "MTZModelStrengthened2"),
+                                                           w(IloArray<IloNumVarArray>(env, instance.n)),
+                                                           t(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
+                                                           pi(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
+                                                           p((instance.n - instance.number_trees + 1) / 2),
+                                                           M(calculates_big_M())
+{
+}
+
+WSN_mtz_model_2_1::WSN_mtz_model_2_1(WSN_data &instance,
+                                     double upper_bound) : WSN(instance, "MTZModelStrengthened2", upper_bound),
                                                            w(IloArray<IloNumVarArray>(env, instance.n)),
                                                            t(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
                                                            pi(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),

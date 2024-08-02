@@ -7,6 +7,7 @@ class WSN_flow_model_0_1 : public WSN
 {
 public:
     WSN_flow_model_0_1(WSN_data &instance);
+    WSN_flow_model_0_1(WSN_data &instance, double upper_bound);
 
 private:
     virtual void build_model();
@@ -47,6 +48,14 @@ WSN_flow_model_0_1::WSN_flow_model_0_1(WSN_data &instance) : WSN(instance, "Flow
                                                              w(IloArray<IloNumVarArray>(env, instance.n + 1)),
                                                              t(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
                                                              M(calculates_big_M())
+{
+}
+
+WSN_flow_model_0_1::WSN_flow_model_0_1(WSN_data &instance, double upper_bound) : WSN(instance, "FlowModel0-1", upper_bound),
+                                                                                 f(IloArray<IloNumVarArray>(env, instance.n + 1)),
+                                                                                 w(IloArray<IloNumVarArray>(env, instance.n + 1)),
+                                                                                 t(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
+                                                                                 M(calculates_big_M())
 {
 }
 

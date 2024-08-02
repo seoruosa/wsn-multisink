@@ -10,6 +10,7 @@ class WSN_mcf_model_weight_on_node : public WSN_mcf_model_base
 {
 public:
     WSN_mcf_model_weight_on_node(WSN_data &instance);
+    WSN_mcf_model_weight_on_node(WSN_data &instance, double upper_bound);
 
 private:
     virtual void build_model() override;
@@ -26,9 +27,18 @@ private:
 };
 
 WSN_mcf_model_weight_on_node::WSN_mcf_model_weight_on_node(WSN_data &instance) : WSN_mcf_model_base(instance),
-                                                                                                   w(IloArray<IloNumVarArray>(env, instance.n)),
-                                                                                                   t(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
-                                                                                                   M(calculates_big_M())
+                                                                                 w(IloArray<IloNumVarArray>(env, instance.n)),
+                                                                                 t(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
+                                                                                 M(calculates_big_M())
+{
+    WSN::formulation_name = "MCF-Model-weight-node-refactor";
+}
+
+WSN_mcf_model_weight_on_node::WSN_mcf_model_weight_on_node(WSN_data &instance,
+                                                           double upper_bound) : WSN_mcf_model_base(instance, upper_bound),
+                                                                                 w(IloArray<IloNumVarArray>(env, instance.n)),
+                                                                                 t(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
+                                                                                 M(calculates_big_M())
 {
     WSN::formulation_name = "MCF-Model-weight-node-refactor";
 }

@@ -6,6 +6,7 @@ class WSN_flow_model_2_1_base : public WSN
 {
 public:
     WSN_flow_model_2_1_base(WSN_data &instance);
+    WSN_flow_model_2_1_base(WSN_data &instance, double upper_bound);
 
 protected:
     virtual void build_model();
@@ -54,6 +55,14 @@ WSN_flow_model_2_1_base::WSN_flow_model_2_1_base(WSN_data &instance) : WSN(insta
                                                                        l(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)), // Node current formulation
                                                                        z_depot(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
                                                                        M(calculates_big_M())
+{
+}
+
+WSN_flow_model_2_1_base::WSN_flow_model_2_1_base(WSN_data &instance, double upper_bound) : WSN(instance, "FlowModel2-1-base", upper_bound),
+                                                                                           f(IloArray<IloNumVarArray>(env, instance.n + instance.number_trees)),
+                                                                                           l(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)), // Node current formulation
+                                                                                           z_depot(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
+                                                                                           M(calculates_big_M())
 {
 }
 
@@ -385,7 +394,7 @@ inline void WSN_flow_model_2_1_base::add_adasme2023_valid_inequalities()
 }
 
 void WSN_flow_model_2_1_base::add_bektas2020_node_current_constraints()
-{ 
+{
     for (int i = 0; i < instance.n; i++)
     {
         for (auto &j : instance.adj_list_from_v[i])

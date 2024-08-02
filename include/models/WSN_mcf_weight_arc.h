@@ -9,6 +9,7 @@ class WSN_mcf_weight_arc_model : public WSN
 {
 public:
     WSN_mcf_weight_arc_model(WSN_data &instance);
+    WSN_mcf_weight_arc_model(WSN_data &instance, double upper_bound);
 
 private:
     virtual void build_model();
@@ -48,6 +49,16 @@ private:
 };
 
 WSN_mcf_weight_arc_model::WSN_mcf_weight_arc_model(WSN_data &instance) : WSN(instance, "MCF-weight-arc-Model"),
+                                                                         x_sink(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
+                                                                         f_sink(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
+                                                                         y_sink(IloArray<IloNumVarArray>(env)),
+                                                                         z_sink(IloArray<IloNumVarArray>(env)),
+                                                                         M(calculates_big_M())
+{
+}
+
+WSN_mcf_weight_arc_model::WSN_mcf_weight_arc_model(WSN_data &instance,
+                                                   double upper_bound) : WSN(instance, "MCF-weight-arc-Model", upper_bound),
                                                                          x_sink(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
                                                                          f_sink(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
                                                                          y_sink(IloArray<IloNumVarArray>(env)),

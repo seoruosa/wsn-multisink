@@ -6,12 +6,19 @@ class WSN_mtz_castro_andrade_2023_new_constraints : public WSN_mtz_castro_andrad
 {
 public:
     WSN_mtz_castro_andrade_2023_new_constraints(WSN_data &instance);
+    WSN_mtz_castro_andrade_2023_new_constraints(WSN_data &instance, double upper_bound);
 
 private:
     virtual void build_model() override;
 };
 
 WSN_mtz_castro_andrade_2023_new_constraints::WSN_mtz_castro_andrade_2023_new_constraints(WSN_data &instance) : WSN_mtz_castro_andrade_2023_sbpo(instance)
+{
+    WSN::formulation_name = "MTZ-castro2023-new-constr";
+}
+
+WSN_mtz_castro_andrade_2023_new_constraints::WSN_mtz_castro_andrade_2023_new_constraints(WSN_data &instance,
+                                                                                         double upper_bound) : WSN_mtz_castro_andrade_2023_sbpo(instance, upper_bound)
 {
     WSN::formulation_name = "MTZ-castro2023-new-constr";
 }

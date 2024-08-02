@@ -9,6 +9,7 @@ class WSN_flow_model_3idx : public WSN
 {
 public:
     WSN_flow_model_3idx(WSN_data &instance);
+    WSN_flow_model_3idx(WSN_data &instance, double upper_bound);
 
 private:
     virtual void build_model();
@@ -31,6 +32,13 @@ private:
 };
 
 WSN_flow_model_3idx::WSN_flow_model_3idx(WSN_data &instance) : WSN(instance, "FlowModel3Index"),
+                                                               f_depot(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
+                                                               z_depot(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees))
+{
+}
+
+WSN_flow_model_3idx::WSN_flow_model_3idx(WSN_data &instance,
+                                         double upper_bound) : WSN(instance, "FlowModel3Index", upper_bound),
                                                                f_depot(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
                                                                z_depot(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees))
 {
@@ -419,7 +427,7 @@ void WSN_flow_model_3idx::add_lower_bound_constraints()
             expr += instance.weight[i][to] * x[i][to];
         }
     }
-    constraints.add(T >= expr/instance.n);
+    constraints.add(T >= expr / instance.n);
     expr.end();
 
     auto minimum_weight = [&]()
@@ -448,14 +456,14 @@ void WSN_flow_model_3idx::add_lower_bound_constraints()
         {
             for (auto &to : instance.adj_list_from_v[i])
             {
-                avg = (avg*count + instance.weight[i][to])/(count + 1);
+                avg = (avg * count + instance.weight[i][to]) / (count + 1);
                 ++count;
             }
         }
 
         return avg;
     };
-    
+
     auto min_weight = minimum_weight();
     IloExpr expr_2(env);
     for (int i = 0; i < instance.n; i++)
@@ -467,8 +475,8 @@ void WSN_flow_model_3idx::add_lower_bound_constraints()
                 expr_2 += f_depot[k][i][to];
             }
         }
-        
-        constraints.add(T >= min_weight*expr_2);
+
+        constraints.add(T >= min_weight * expr_2);
 
         expr_2.end();
         expr_2 = IloExpr(env);

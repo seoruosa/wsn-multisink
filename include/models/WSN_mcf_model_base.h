@@ -6,6 +6,7 @@ class WSN_mcf_model_base : public WSN
 {
 public:
     WSN_mcf_model_base(WSN_data &instance);
+    WSN_mcf_model_base(WSN_data &instance, double upper_bound);
 
 protected:
     virtual void build_model();
@@ -36,6 +37,15 @@ protected:
 };
 
 WSN_mcf_model_base::WSN_mcf_model_base(WSN_data &instance) : WSN(instance, "MCF-Model-base"),
+                                                             x_sink(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
+                                                             f_node(IloArray<IloArray<IloNumVarArray>>(env, instance.n)),
+                                                             y_sink(IloArray<IloNumVarArray>(env)),
+                                                             z_sink(IloArray<IloNumVarArray>(env))
+{
+}
+
+WSN_mcf_model_base::WSN_mcf_model_base(WSN_data &instance,
+                                       double upper_bound) : WSN(instance, "MCF-Model-base", upper_bound),
                                                              x_sink(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
                                                              f_node(IloArray<IloArray<IloNumVarArray>>(env, instance.n)),
                                                              y_sink(IloArray<IloNumVarArray>(env)),

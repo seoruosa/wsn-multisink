@@ -6,10 +6,17 @@ class WSN_flow_model_2_1 : public WSN_flow_model_2_1_base
 {
 public:
     WSN_flow_model_2_1(WSN_data &instance);
+    WSN_flow_model_2_1(WSN_data &instance, double upper_bound);
     virtual void build_model();
 };
 
 WSN_flow_model_2_1::WSN_flow_model_2_1(WSN_data &instance) : WSN_flow_model_2_1_base(instance)
+{
+    WSN::formulation_name = "FlowModel2-1";
+}
+
+WSN_flow_model_2_1::WSN_flow_model_2_1(WSN_data &instance,
+                                       double upper_bound) : WSN_flow_model_2_1_base(instance, upper_bound)
 {
     WSN::formulation_name = "FlowModel2-1";
 }
