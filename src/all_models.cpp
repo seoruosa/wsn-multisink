@@ -22,11 +22,11 @@ int main(int argc, char *argv[])
 
         if (params.upper_bound > 0)
         {
-            model_runner = initialize_all_models(instance);
+            model_runner = initialize_all_models(instance, params.upper_bound);
         }
         else
         {
-            model_runner = initialize_all_models(instance, params.upper_bound);
+            model_runner = initialize_all_models(instance);
         }
 
         (*model_runner).run_model(params.model, params.relaxed);

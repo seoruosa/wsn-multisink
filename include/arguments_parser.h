@@ -20,7 +20,7 @@ struct Run_Params
     int number_sinks = 1;
     unsigned seed;
     bool relaxed = false;
-    float upper_bound = -1.0f;
+    double upper_bound = -1.0;
     std::vector<std::string> constraints = {};
 
     friend std::ostream &operator<<(std::ostream &os, const Run_Params &o)
@@ -102,7 +102,7 @@ Run_Params read_arguments(int argc, char **argv)
     int number_sinks = 1;
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     bool relaxed = false;
-    float upper_bound = -1.0f;
+    double upper_bound = -1.0;
     std::vector<std::string> constraints({});
 
     while (true)
@@ -157,8 +157,8 @@ Run_Params read_arguments(int argc, char **argv)
         case 'c':
             constraints = read_constraints(optarg);
             break;
-        case 'B':
-            upper_bound = (optarg == NULL) ? upper_bound : std::stof(optarg);
+        case 'U':
+            upper_bound = (optarg == NULL) ? upper_bound : std::stod(optarg);
             break;
         case 'h': // -h or --help
         case '?': // Unrecognized option
