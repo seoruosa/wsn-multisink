@@ -83,6 +83,7 @@ void WSN_flow_model_3_base::build_model()
     add_bridge_master_neighbor_constraints(); // exp 14
     add_master_neighbor_constraints();        // exp 21
     add_trivial_tree_constraints();
+    add_upper_bound_constraint();
 
     add_flow_limit_constraints();        // exp 5, 7, 8
     add_flow_conservation_constraints(); // exp 6

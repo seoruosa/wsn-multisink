@@ -59,6 +59,7 @@ void WSN_flow_model_3_check_instance::build_model()
     add_node_master_or_bridge_constraints();  // exp 12
     add_bridges_not_neighbor_constraints();   // exp 13
     add_bridge_master_neighbor_constraints(); // exp 14
+    add_upper_bound_constraint();
 
     add_trivial_tree_constraints();
 

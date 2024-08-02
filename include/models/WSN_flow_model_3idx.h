@@ -47,6 +47,7 @@ WSN_flow_model_3idx::WSN_flow_model_3idx(WSN_data &instance,
 inline void WSN_flow_model_3idx::build_model()
 {
     create_basic_model_constraints();
+    add_upper_bound_constraint();
 
     add_flow_model_variables();
 

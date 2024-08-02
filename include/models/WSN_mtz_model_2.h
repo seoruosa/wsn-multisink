@@ -76,6 +76,7 @@ void WSN_mtz_model_2::build_model()
     add_master_not_adj_master_constraints();
     add_bridges_not_neighbor_constraints();
     add_bridge_master_neighbor_constraints();
+    add_upper_bound_constraint();
 
     add_in_coming_edge_mtz_constraints();
 

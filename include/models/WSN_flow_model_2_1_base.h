@@ -88,6 +88,7 @@ void WSN_flow_model_2_1_base::build_model()
     add_node_master_or_bridge_constraints();  // exp 12
     add_bridges_not_neighbor_constraints();   // exp 13
     add_bridge_master_neighbor_constraints(); // exp 14
+    add_upper_bound_constraint();
 
     add_lower_bound_constraints();     // exp 20
     add_master_neighbor_constraints(); // exp 21
