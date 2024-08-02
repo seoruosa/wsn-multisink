@@ -17,7 +17,7 @@ private:
 
     IloArray<IloNumVarArray> w;
     IloNumVarArray t;
-    int M;
+    double M;
 
     void add_weight_calculation_variables();
     // constraints to calculate the weight of trees
@@ -28,7 +28,7 @@ private:
 WSN_mcf_model_weight_on_node::WSN_mcf_model_weight_on_node(WSN_data &instance) : WSN_mcf_model_base(instance),
                                                                                                    w(IloArray<IloNumVarArray>(env, instance.n)),
                                                                                                    t(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
-                                                                                                   M(int(calculates_big_M()))
+                                                                                                   M(calculates_big_M())
 {
     WSN::formulation_name = "MCF-Model-weight-node-refactor";
 }

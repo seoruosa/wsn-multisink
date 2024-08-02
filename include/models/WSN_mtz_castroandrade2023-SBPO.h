@@ -20,7 +20,7 @@ protected:
     IloNumVar T;
 
     int p;
-    int M;
+    double M;
 
     void add_mtz_model_variables();
 
@@ -56,7 +56,7 @@ WSN_mtz_castro_andrade_2023_sbpo::WSN_mtz_castro_andrade_2023_sbpo(WSN_data &ins
                                                                                          pi(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
                                                                                          T(IloNumVar(env, 0, IloInfinity, ILOFLOAT)),
                                                                                          p((instance.n - instance.number_trees + 1) / 2),
-                                                                                         M(int(calculates_big_M()))
+                                                                                         M(calculates_big_M())
 //    M(100000)
 {
 }

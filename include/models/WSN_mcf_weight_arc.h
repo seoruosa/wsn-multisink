@@ -21,7 +21,7 @@ private:
 
     IloNumVar T;
 
-    int M;
+    double M;
 
     virtual void add_objective_function();
 
@@ -55,7 +55,7 @@ WSN_mcf_weight_arc_model::WSN_mcf_weight_arc_model(WSN_data &instance) : WSN(ins
                                                                          f_sink(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
                                                                          y_sink(IloArray<IloNumVarArray>(env)),
                                                                          z_sink(IloArray<IloNumVarArray>(env)),
-                                                                         M(int(calculates_big_M()))
+                                                                         M(calculates_big_M())
 {
 }
 

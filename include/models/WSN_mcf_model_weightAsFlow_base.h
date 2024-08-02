@@ -21,7 +21,7 @@ protected:
     IloArray<IloNumVarArray> z_sink; // bridge sink assignment
 
     IloNumVar T;
-    int M;
+    double M;
 
     virtual void add_objective_function();
 

@@ -19,7 +19,7 @@ public:
 
     IloNumVar T;
 
-    int M;
+    double M;
 
     virtual void add_objective_function();
 
@@ -53,7 +53,7 @@ public:
 WSN_flow_model_3_base::WSN_flow_model_3_base(WSN_data &instance) : WSN(instance, "FlowModel3-base"),
                                                                    f(IloArray<IloNumVarArray>(env, instance.n + instance.number_trees)),
                                                                    T(IloNumVar(env, 0, IloInfinity, ILOFLOAT)),
-                                                                   M(int(calculates_big_M()))
+                                                                   M(calculates_big_M())
 {
 }
 

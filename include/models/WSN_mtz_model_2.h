@@ -19,7 +19,7 @@ private:
     IloNumVar T;
 
     int p;
-    int M;
+    double M;
 
     void add_mtz_model_variables();
 
@@ -51,7 +51,7 @@ WSN_mtz_model_2::WSN_mtz_model_2(WSN_data &instance) : WSN(instance, "MTZModelSt
                                                        pi(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
                                                        T(IloNumVar(env, 0, IloInfinity, ILOFLOAT)),
                                                        p((instance.n - instance.number_trees + 1) / 2),
-                                                       M(int(calculates_big_M()))
+                                                       M(calculates_big_M())
 {
 }
 
