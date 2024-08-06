@@ -6,12 +6,19 @@ class WSN_flow_model_3_testing_ineq : public WSN_flow_model_3_base
 {
 private:
     virtual void build_model();
-    
+
 public:
     WSN_flow_model_3_testing_ineq(WSN_data &instance);
+    WSN_flow_model_3_testing_ineq(WSN_data &instance, double upper_bound);
 };
 
 WSN_flow_model_3_testing_ineq::WSN_flow_model_3_testing_ineq(WSN_data &instance) : WSN_flow_model_3_base(instance)
+{
+    WSN::formulation_name = "FlowModel3-testing-ineq";
+}
+
+WSN_flow_model_3_testing_ineq::WSN_flow_model_3_testing_ineq(WSN_data &instance,
+                                                             double upper_bound) : WSN_flow_model_3_base(instance, upper_bound)
 {
     WSN::formulation_name = "FlowModel3-testing-ineq";
 }
@@ -31,6 +38,7 @@ void WSN_flow_model_3_testing_ineq::build_model()
     add_bridge_master_neighbor_constraints(); // exp 14
     add_master_neighbor_constraints();        // exp 21
     add_trivial_tree_constraints();
+    add_upper_bound_constraint();
 
     add_flow_limit_constraints();        // exp 5, 7, 8
     add_flow_conservation_constraints(); // exp 6
@@ -52,12 +60,19 @@ class WSN_flow_model_3_valid_ineq : public WSN_flow_model_3_base
 {
 private:
     virtual void build_model();
-    
+
 public:
     WSN_flow_model_3_valid_ineq(WSN_data &instance);
+    WSN_flow_model_3_valid_ineq(WSN_data &instance, double upper_bound);
 };
 
 WSN_flow_model_3_valid_ineq::WSN_flow_model_3_valid_ineq(WSN_data &instance) : WSN_flow_model_3_base(instance)
+{
+    WSN::formulation_name = "FlowModel3-valid-ineq";
+}
+
+WSN_flow_model_3_valid_ineq::WSN_flow_model_3_valid_ineq(WSN_data &instance,
+                                                         double upper_bound) : WSN_flow_model_3_base(instance, upper_bound)
 {
     WSN::formulation_name = "FlowModel3-valid-ineq";
 }
@@ -77,6 +92,7 @@ void WSN_flow_model_3_valid_ineq::build_model()
     add_bridge_master_neighbor_constraints(); // exp 14
     add_master_neighbor_constraints();        // exp 21
     add_trivial_tree_constraints();
+    add_upper_bound_constraint();
 
     add_flow_limit_constraints();        // exp 5, 7, 8
     add_flow_conservation_constraints(); // exp 6

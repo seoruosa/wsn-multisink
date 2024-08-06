@@ -6,6 +6,7 @@ class WSN_flow_model_1 : public WSN
 {
 public:
     WSN_flow_model_1(WSN_data &instance);
+    WSN_flow_model_1(WSN_data &instance, double upper_bound);
 
 private:
     virtual void build_model();
@@ -16,9 +17,7 @@ private:
     IloNumVarArray t;
     IloNumVarArray l; // Node current formulation
 
-    IloNumVar T;
-
-    int M;
+    double M;
 
     virtual void add_objective_function();
 
@@ -53,8 +52,17 @@ WSN_flow_model_1::WSN_flow_model_1(WSN_data &instance) : WSN(instance, "FlowMode
                                                          w_a(IloArray<IloNumVarArray>(env, instance.n + instance.number_trees)),
                                                          t(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
                                                          l(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)), // Node current formulation
-                                                         T(IloNumVar(env, 0, IloInfinity, ILOFLOAT)),
-                                                         M(int(calculates_big_M()))
+                                                         M(calculates_big_M())
+{
+}
+
+WSN_flow_model_1::WSN_flow_model_1(WSN_data &instance, double upper_bound) : WSN(instance, "FlowModel1", upper_bound),
+                                                                             f(IloArray<IloNumVarArray>(env, instance.n + instance.number_trees)),
+                                                                             w(IloArray<IloNumVarArray>(env, instance.n + instance.number_trees)),
+                                                                             w_a(IloArray<IloNumVarArray>(env, instance.n + instance.number_trees)),
+                                                                             t(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
+                                                                             l(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)), // Node current formulation
+                                                                             M(calculates_big_M())
 {
 }
 
@@ -79,6 +87,7 @@ void WSN_flow_model_1::build_model()
     add_node_master_or_bridge_constraints();  // exp 12
     add_bridges_not_neighbor_constraints();   // exp 13
     add_bridge_master_neighbor_constraints(); // exp 14
+    add_upper_bound_constraint();
 
     add_calculate_weight_tree_constraints(); // exp 15, 16, 17, 18, 19
     add_lower_bound_constraints();           // exp 20

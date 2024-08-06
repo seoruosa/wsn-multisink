@@ -6,6 +6,7 @@ class WSN_mcf_model_base : public WSN
 {
 public:
     WSN_mcf_model_base(WSN_data &instance);
+    WSN_mcf_model_base(WSN_data &instance, double upper_bound);
 
 protected:
     virtual void build_model();
@@ -15,8 +16,6 @@ protected:
 
     IloArray<IloNumVarArray> y_sink; // master sink assignment
     IloArray<IloNumVarArray> z_sink; // bridge sink assignment
-
-    IloNumVar T;
 
     virtual void add_objective_function();
 
@@ -38,7 +37,15 @@ protected:
 };
 
 WSN_mcf_model_base::WSN_mcf_model_base(WSN_data &instance) : WSN(instance, "MCF-Model-base"),
-                                                             T(IloNumVar(env, 0, IloInfinity, ILOFLOAT)),
+                                                             x_sink(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
+                                                             f_node(IloArray<IloArray<IloNumVarArray>>(env, instance.n)),
+                                                             y_sink(IloArray<IloNumVarArray>(env)),
+                                                             z_sink(IloArray<IloNumVarArray>(env))
+{
+}
+
+WSN_mcf_model_base::WSN_mcf_model_base(WSN_data &instance,
+                                       double upper_bound) : WSN(instance, "MCF-Model-base", upper_bound),
                                                              x_sink(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
                                                              f_node(IloArray<IloArray<IloNumVarArray>>(env, instance.n)),
                                                              y_sink(IloArray<IloNumVarArray>(env)),
@@ -58,6 +65,7 @@ inline void WSN_mcf_model_base::build_model()
     add_master_not_adj_master_constraints();
     add_bridges_not_neighbor_constraints();
     add_bridge_master_neighbor_constraints();
+    add_upper_bound_constraint();
 
     add_trivial_tree_constraints();
 

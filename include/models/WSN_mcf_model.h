@@ -6,6 +6,7 @@ class WSN_mcf_model : public WSN_mcf_model_base
 {
 public:
     WSN_mcf_model(WSN_data &instance);
+    WSN_mcf_model(WSN_data &instance, double upper_bound);
 
 private:
     virtual void build_model() override;
@@ -13,6 +14,11 @@ private:
 };
 
 WSN_mcf_model::WSN_mcf_model(WSN_data &instance) : WSN_mcf_model_base(instance)
+{
+    WSN::formulation_name = "MCF-Model";
+}
+
+WSN_mcf_model::WSN_mcf_model(WSN_data &instance, double upper_bound) : WSN_mcf_model_base(instance, upper_bound)
 {
     WSN::formulation_name = "MCF-Model";
 }
@@ -29,6 +35,7 @@ inline void WSN_mcf_model::build_model()
     add_master_not_adj_master_constraints();
     add_bridges_not_neighbor_constraints();
     add_bridge_master_neighbor_constraints();
+    add_upper_bound_constraint();
 
     add_trivial_tree_constraints();
 

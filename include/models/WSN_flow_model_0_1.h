@@ -7,6 +7,7 @@ class WSN_flow_model_0_1 : public WSN
 {
 public:
     WSN_flow_model_0_1(WSN_data &instance);
+    WSN_flow_model_0_1(WSN_data &instance, double upper_bound);
 
 private:
     virtual void build_model();
@@ -15,9 +16,7 @@ private:
     IloArray<IloNumVarArray> w;
     IloNumVarArray t;
 
-    IloNumVar T;
-
-    int M;
+    double M;
 
     virtual void add_objective_function();
 
@@ -48,8 +47,15 @@ WSN_flow_model_0_1::WSN_flow_model_0_1(WSN_data &instance) : WSN(instance, "Flow
                                                              f(IloArray<IloNumVarArray>(env, instance.n + 1)),
                                                              w(IloArray<IloNumVarArray>(env, instance.n + 1)),
                                                              t(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
-                                                             T(IloNumVar(env, 0, IloInfinity, ILOFLOAT)),
-                                                             M(int(calculates_big_M()))
+                                                             M(calculates_big_M())
+{
+}
+
+WSN_flow_model_0_1::WSN_flow_model_0_1(WSN_data &instance, double upper_bound) : WSN(instance, "FlowModel0-1", upper_bound),
+                                                                                 f(IloArray<IloNumVarArray>(env, instance.n + 1)),
+                                                                                 w(IloArray<IloNumVarArray>(env, instance.n + 1)),
+                                                                                 t(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
+                                                                                 M(calculates_big_M())
 {
 }
 
@@ -74,6 +80,7 @@ void WSN_flow_model_0_1::build_model()
     add_node_master_or_bridge_constraints();  // exp 12
     add_bridges_not_neighbor_constraints();   // exp 13
     add_bridge_master_neighbor_constraints(); // exp 14
+    add_upper_bound_constraint();
     add_trivial_tree_constraints();
 
     add_calculate_weight_tree_constraints(); // exp 15, 16, 17, 18, 19

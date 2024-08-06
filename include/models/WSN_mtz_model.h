@@ -7,7 +7,7 @@ class WSN_mtz_model : public WSN
 {
 public:
     WSN_mtz_model(WSN_data &instance);
-    // ~WSN_mtz_model();
+    WSN_mtz_model(WSN_data &instance, double upper_bound);
 
 private:
     virtual void build_model();
@@ -16,7 +16,6 @@ private:
     IloArray<IloNumVarArray> w;
     IloNumVarArray t;
     IloNumVarArray pi;
-    IloNumVar T;
 
     int p;
     int M;
@@ -42,7 +41,16 @@ WSN_mtz_model::WSN_mtz_model(WSN_data &instance) : WSN(instance, "MTZModelBasic"
                                                    w(IloArray<IloNumVarArray>(env, instance.n)),
                                                    t(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
                                                    pi(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
-                                                   T(IloNumVar(env, 0, IloInfinity, ILOFLOAT)),
+                                                   p((instance.n - instance.number_trees + 1) / 2),
+                                                   M(100000)
+{
+}
+
+WSN_mtz_model::WSN_mtz_model(WSN_data &instance,
+                             double upper_bound) : WSN(instance, "MTZModelBasic", upper_bound),
+                                                   w(IloArray<IloNumVarArray>(env, instance.n)),
+                                                   t(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
+                                                   pi(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
                                                    p((instance.n - instance.number_trees + 1) / 2),
                                                    M(100000)
 {
@@ -61,8 +69,9 @@ void WSN_mtz_model::build_model()
     add_master_not_adj_master_constraints();
     add_bridges_not_neighbor_constraints();
     add_bridge_master_neighbor_constraints();
+    add_upper_bound_constraint();
 
-    add_in_coming_edge_mtz_constraints(); 
+    add_in_coming_edge_mtz_constraints();
 
     add_mtz_model_variables();
     add_subtour_constraints(); // constraints 3
@@ -153,20 +162,18 @@ void WSN_mtz_model::add_calculate_weight_tree_constraints()
         {
             expr += w[i][j];
 
-            constraints.add(w[i][j] <= M*x[i][j]); // constraints doc 12
-            constraints.add(t[j] + instance.weight[i][j]*x[i][j] + M*(1 - x[i][j]) >= w[i][j]); // constraints doc 13
-            constraints.add(t[j] + instance.weight[i][j]*x[i][j] - M*(1 - x[i][j]) <= w[i][j]); // constraints doc 14
+            constraints.add(w[i][j] <= M * x[i][j]);                                                // constraints doc 12
+            constraints.add(t[j] + instance.weight[i][j] * x[i][j] + M * (1 - x[i][j]) >= w[i][j]); // constraints doc 13
+            constraints.add(t[j] + instance.weight[i][j] * x[i][j] - M * (1 - x[i][j]) <= w[i][j]); // constraints doc 14
         }
 
-        constraints.add(t[i] <= M*(y[i] + z[i])); // constraints doc 11
-        constraints.add(t[i] >= expr); // constraints doc 15
-        // constraints.add(); // constraints doc 
+        constraints.add(t[i] <= M * (y[i] + z[i])); // constraints doc 11
+        constraints.add(t[i] >= expr);              // constraints doc 15
+        // constraints.add(); // constraints doc
 
         expr.end();
         expr = IloExpr(env);
     }
-
-
 
     expr.end();
 }

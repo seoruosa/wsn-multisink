@@ -7,7 +7,7 @@ class WSN_mtz_model_2 : public WSN
 {
 public:
     WSN_mtz_model_2(WSN_data &instance);
-    // ~WSN_mtz_model_2();
+    WSN_mtz_model_2(WSN_data &instance, double upper_bound);
 
 private:
     virtual void build_model();
@@ -16,10 +16,9 @@ private:
     IloArray<IloNumVarArray> w;
     IloNumVarArray t;
     IloNumVarArray pi;
-    IloNumVar T;
 
     int p;
-    int M;
+    double M;
 
     void add_mtz_model_variables();
 
@@ -49,9 +48,18 @@ WSN_mtz_model_2::WSN_mtz_model_2(WSN_data &instance) : WSN(instance, "MTZModelSt
                                                        w(IloArray<IloNumVarArray>(env, instance.n)),
                                                        t(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
                                                        pi(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
-                                                       T(IloNumVar(env, 0, IloInfinity, ILOFLOAT)),
                                                        p((instance.n - instance.number_trees + 1) / 2),
-                                                       M(int(calculates_big_M()))
+                                                       M(calculates_big_M())
+{
+}
+
+WSN_mtz_model_2::WSN_mtz_model_2(WSN_data &instance,
+                                 double upper_bound) : WSN(instance, "MTZModelStrengthened", upper_bound),
+                                                       w(IloArray<IloNumVarArray>(env, instance.n)),
+                                                       t(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
+                                                       pi(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
+                                                       p((instance.n - instance.number_trees + 1) / 2),
+                                                       M(calculates_big_M())
 {
 }
 
@@ -68,6 +76,7 @@ void WSN_mtz_model_2::build_model()
     add_master_not_adj_master_constraints();
     add_bridges_not_neighbor_constraints();
     add_bridge_master_neighbor_constraints();
+    add_upper_bound_constraint();
 
     add_in_coming_edge_mtz_constraints();
 
@@ -232,12 +241,12 @@ void WSN_mtz_model_2::add_lower_bound_weight_constraints()
     //                         ++num_visits[el];
     //                         stack.push_back(el);
     //                     }
-                            
+
     //                 }
     //             }
     //         }
     //     }
-        
+
     // };
 
     // for (int i = 0; i < instance.n; i++)

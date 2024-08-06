@@ -6,6 +6,7 @@ class WSN_arv_rot_model_flow_base : public WSN_arvore_rotulada_model_base
 {
 public:
     WSN_arv_rot_model_flow_base(WSN_data &instance);
+    WSN_arv_rot_model_flow_base(WSN_data &instance, double upper_bound);
 
 private:
     virtual void build_model();
@@ -16,9 +17,15 @@ WSN_arv_rot_model_flow_base::WSN_arv_rot_model_flow_base(WSN_data &instance) : W
     WSN::formulation_name = "MAR-flow-base";
 }
 
+WSN_arv_rot_model_flow_base::WSN_arv_rot_model_flow_base(WSN_data &instance,
+                                                         double upper_bound) : WSN_arvore_rotulada_model_base(instance, upper_bound)
+{
+    WSN::formulation_name = "MAR-flow-base";
+}
+
 inline void WSN_arv_rot_model_flow_base::build_model()
 {
-   // basic model
+    // basic model
     add_decision_variables();
     add_number_dominating_nodes_constraints();
     add_number_forest_edges_constraints();
@@ -28,6 +35,7 @@ inline void WSN_arv_rot_model_flow_base::build_model()
     add_master_not_adj_master_constraints();
     add_bridges_not_neighbor_constraints();
     add_bridge_master_neighbor_constraints();
+    add_upper_bound_constraint();
 
     add_trivial_tree_constraints();
 
@@ -48,6 +56,7 @@ class WSN_arv_rot_model_flow : public WSN_arvore_rotulada_model_base
 {
 public:
     WSN_arv_rot_model_flow(WSN_data &instance);
+    WSN_arv_rot_model_flow(WSN_data &instance, double upper_bound);
 
 private:
     virtual void build_model();
@@ -58,9 +67,15 @@ WSN_arv_rot_model_flow::WSN_arv_rot_model_flow(WSN_data &instance) : WSN_arvore_
     WSN::formulation_name = "MAR-flow";
 }
 
+WSN_arv_rot_model_flow::WSN_arv_rot_model_flow(WSN_data &instance,
+                                               double upper_bound) : WSN_arvore_rotulada_model_base(instance, upper_bound)
+{
+    WSN::formulation_name = "MAR-flow";
+}
+
 inline void WSN_arv_rot_model_flow::build_model()
 {
-   // basic model
+    // basic model
     add_decision_variables();
     add_number_dominating_nodes_constraints();
     add_number_forest_edges_constraints();
@@ -70,6 +85,7 @@ inline void WSN_arv_rot_model_flow::build_model()
     add_master_not_adj_master_constraints();
     add_bridges_not_neighbor_constraints();
     add_bridge_master_neighbor_constraints();
+    add_upper_bound_constraint();
 
     add_trivial_tree_constraints();
 

@@ -6,12 +6,19 @@ class WSN_repr_model_mtz_base : public WSN_representante_model_base
 {
 public:
     WSN_repr_model_mtz_base(WSN_data &instance);
+    WSN_repr_model_mtz_base(WSN_data &instance, double upper_bound);
 
 private:
     virtual void build_model();
 };
 
 WSN_repr_model_mtz_base::WSN_repr_model_mtz_base(WSN_data &instance) : WSN_representante_model_base(instance)
+{
+    WSN::formulation_name = "REPR-mtz-base";
+}
+
+WSN_repr_model_mtz_base::WSN_repr_model_mtz_base(WSN_data &instance,
+                                                 double upper_bound) : WSN_representante_model_base(instance, upper_bound)
 {
     WSN::formulation_name = "REPR-mtz-base";
 }
@@ -27,6 +34,7 @@ inline void WSN_repr_model_mtz_base::build_model()
     add_master_not_adj_master_constraints();
     add_bridges_not_neighbor_constraints();
     add_bridge_master_neighbor_constraints();
+    add_upper_bound_constraint();
 
     add_trivial_tree_constraints();
 
@@ -47,12 +55,19 @@ class WSN_repr_model_mtz : public WSN_representante_model_base
 {
 public:
     WSN_repr_model_mtz(WSN_data &instance);
+    WSN_repr_model_mtz(WSN_data &instance, double upper_bound);
 
 private:
     virtual void build_model();
 };
 
 WSN_repr_model_mtz::WSN_repr_model_mtz(WSN_data &instance) : WSN_representante_model_base(instance)
+{
+    WSN::formulation_name = "REPR-mtz";
+}
+
+WSN_repr_model_mtz::WSN_repr_model_mtz(WSN_data &instance,
+                                       double upper_bound) : WSN_representante_model_base(instance, upper_bound)
 {
     WSN::formulation_name = "REPR-mtz";
 }
@@ -68,6 +83,7 @@ inline void WSN_repr_model_mtz::build_model()
     add_master_not_adj_master_constraints();
     add_bridges_not_neighbor_constraints();
     add_bridge_master_neighbor_constraints();
+    add_upper_bound_constraint();
 
     add_trivial_tree_constraints();
 

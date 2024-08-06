@@ -6,12 +6,19 @@ class WSN_mtz_castro_andrade_2023_new_constraints : public WSN_mtz_castro_andrad
 {
 public:
     WSN_mtz_castro_andrade_2023_new_constraints(WSN_data &instance);
+    WSN_mtz_castro_andrade_2023_new_constraints(WSN_data &instance, double upper_bound);
 
 private:
     virtual void build_model() override;
 };
 
 WSN_mtz_castro_andrade_2023_new_constraints::WSN_mtz_castro_andrade_2023_new_constraints(WSN_data &instance) : WSN_mtz_castro_andrade_2023_sbpo(instance)
+{
+    WSN::formulation_name = "MTZ-castro2023-new-constr";
+}
+
+WSN_mtz_castro_andrade_2023_new_constraints::WSN_mtz_castro_andrade_2023_new_constraints(WSN_data &instance,
+                                                                                         double upper_bound) : WSN_mtz_castro_andrade_2023_sbpo(instance, upper_bound)
 {
     WSN::formulation_name = "MTZ-castro2023-new-constr";
 }
@@ -27,6 +34,7 @@ void WSN_mtz_castro_andrade_2023_new_constraints::build_model()
     add_master_not_adj_master_constraints();   // Const CA2023 -> 5
     add_bridges_not_neighbor_constraints();    // Const CA2023 -> 7
     add_bridge_master_neighbor_constraints();  // Const CA2023 -> 8
+    add_upper_bound_constraint();
 
     add_in_coming_edge_mtz_constraints(); // Const CA2023 -> 3
 

@@ -9,6 +9,7 @@ class WSN_mcf_weight_arc_model : public WSN
 {
 public:
     WSN_mcf_weight_arc_model(WSN_data &instance);
+    WSN_mcf_weight_arc_model(WSN_data &instance, double upper_bound);
 
 private:
     virtual void build_model();
@@ -19,9 +20,7 @@ private:
     IloArray<IloNumVarArray> y_sink; // master sink assignment
     IloArray<IloNumVarArray> z_sink; // bridge sink assignment
 
-    IloNumVar T;
-
-    int M;
+    double M;
 
     virtual void add_objective_function();
 
@@ -50,12 +49,21 @@ private:
 };
 
 WSN_mcf_weight_arc_model::WSN_mcf_weight_arc_model(WSN_data &instance) : WSN(instance, "MCF-weight-arc-Model"),
-                                                                         T(IloNumVar(env, 0, IloInfinity, ILOFLOAT)),
                                                                          x_sink(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
                                                                          f_sink(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
                                                                          y_sink(IloArray<IloNumVarArray>(env)),
                                                                          z_sink(IloArray<IloNumVarArray>(env)),
-                                                                         M(int(calculates_big_M()))
+                                                                         M(calculates_big_M())
+{
+}
+
+WSN_mcf_weight_arc_model::WSN_mcf_weight_arc_model(WSN_data &instance,
+                                                   double upper_bound) : WSN(instance, "MCF-weight-arc-Model", upper_bound),
+                                                                         x_sink(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
+                                                                         f_sink(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
+                                                                         y_sink(IloArray<IloNumVarArray>(env)),
+                                                                         z_sink(IloArray<IloNumVarArray>(env)),
+                                                                         M(calculates_big_M())
 {
 }
 
@@ -71,6 +79,7 @@ inline void WSN_mcf_weight_arc_model::build_model()
     add_master_not_adj_master_constraints();
     add_bridges_not_neighbor_constraints();
     add_bridge_master_neighbor_constraints();
+    add_upper_bound_constraint();
 
     add_trivial_tree_constraints();
 

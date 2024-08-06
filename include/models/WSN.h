@@ -10,16 +10,17 @@
 
 /**
  * @brief Class that defines a common part of implementation of a mip model for WSN problem
- * 
+ *
  */
 class WSN
 {
 public:
+    WSN(WSN_data &instance, std::string formulation_name, double upper_bound);
     WSN(WSN_data &instance, std::string formulation_name);
     void solve(bool solve_relaxed = false);
     std::string name_model_instance();
 
-// protected:
+    // protected:
     virtual void build_model() = 0;
     std::string formulation_name;
     WSN_data &instance;
@@ -34,6 +35,9 @@ public:
 
     IloArray<IloNumVarArray> x; // edges
     IloNumVar N;                // number of bridge and master nodes
+    IloNumVar T;                // variable used on objective value
+
+    double upper_bound; // upper bound
 
     virtual void add_objective_function() = 0;
     void add_decision_variables();
@@ -70,6 +74,9 @@ public:
     // create decision variables and add basic model constraints
     void create_basic_model_constraints();
 
+    // add a upper bound to the model
+    void add_upper_bound_constraint();
+
     // returns a copy of actual model with a relaxation of the integer variables
     virtual IloModel create_relaxed();
 
@@ -86,6 +93,19 @@ public:
     virtual void print_full(IloCplex &cplex, std::ostream &cout = std::cout);
 };
 
+WSN::WSN(WSN_data &instance, std::string formulation_name, double upper_bound) : instance(instance),
+                                                                                 formulation_name(formulation_name),
+                                                                                 constraints(IloRangeArray(env)),
+                                                                                 model(IloModel(env)),
+                                                                                 z(IloNumVarArray(env)),
+                                                                                 y(IloNumVarArray(env)),
+                                                                                 x(IloArray<IloNumVarArray>(env)),
+                                                                                 N(IloNumVar(env)),
+                                                                                 T(IloNumVar(env, 0, IloInfinity, ILOFLOAT)),
+                                                                                 upper_bound(upper_bound)
+{
+}
+
 WSN::WSN(WSN_data &instance, std::string formulation_name) : instance(instance),
                                                              formulation_name(formulation_name),
                                                              constraints(IloRangeArray(env)),
@@ -93,7 +113,9 @@ WSN::WSN(WSN_data &instance, std::string formulation_name) : instance(instance),
                                                              z(IloNumVarArray(env)),
                                                              y(IloNumVarArray(env)),
                                                              x(IloArray<IloNumVarArray>(env)),
-                                                             N(IloNumVar(env))
+                                                             N(IloNumVar(env)),
+                                                             T(IloNumVar(env, 0, IloInfinity, ILOFLOAT)),
+                                                             upper_bound(std::numeric_limits<double>::max())
 {
 }
 
@@ -312,8 +334,14 @@ void WSN::create_basic_model_constraints()
     add_master_not_adj_master_constraints();
     add_bridges_not_neighbor_constraints();
     add_bridge_master_neighbor_constraints();
+    add_upper_bound_constraint();
 
     add_trivial_tree_constraints();
+}
+
+inline void WSN::add_upper_bound_constraint()
+{
+    constraints.add(T <= upper_bound);
 }
 
 std::string WSN::name_model_instance()
@@ -391,56 +419,56 @@ void WSN::solve_relaxed(std::string &name_model_instance, std::string time_now)
 void WSN::solve_mip(std::string &name_model_instance, std::string time_now)
 {
     std::ofstream cplex_out((name_model_instance + ".log").c_str());
-        std::ofstream cplex_warn_error((name_model_instance + ".warn.log").c_str());
-        std::ofstream solution((name_model_instance + ".sol").c_str());
-        std::ofstream cout((name_model_instance + ".out").c_str());
+    std::ofstream cplex_warn_error((name_model_instance + ".warn.log").c_str());
+    std::ofstream solution((name_model_instance + ".sol").c_str());
+    std::ofstream cout((name_model_instance + ".out").c_str());
 
-        cout << time_now << std::endl;
-        solution << time_now << std::endl;
+    cout << time_now << std::endl;
+    solution << time_now << std::endl;
 
-        // SOLVE ORIGINAL MODEL
-        IloCplex cplex(model);
+    // SOLVE ORIGINAL MODEL
+    IloCplex cplex(model);
 
-        cplex.setOut(cplex_out);
-        cplex.setWarning(cplex_warn_error);
-        cplex.setError(cplex_warn_error);
+    cplex.setOut(cplex_out);
+    cplex.setWarning(cplex_warn_error);
+    cplex.setError(cplex_warn_error);
 
-        cplex.exportModel((name_model_instance + ".lp").c_str());
+    cplex.exportModel((name_model_instance + ".lp").c_str());
 
-        auto start = perf::time::start();
-        set_params_cplex(cplex);
+    auto start = perf::time::start();
+    set_params_cplex(cplex);
 
-        create_start_solution(cplex);
+    create_start_solution(cplex);
 
-        cplex.solve();
+    cplex.solve();
 
-        double gap = cplex.getMIPRelativeGap();
+    double gap = cplex.getMIPRelativeGap();
 
-        auto elapsed = perf::time::duration(start).count();
+    auto elapsed = perf::time::duration(start).count();
 
-        cout << "time: " << elapsed << std::endl;
-        cout << "obj: " << cplex.getObjValue() << std::endl;
-        cout << "best_obj: " << cplex.getBestObjValue() << std::endl;
-        cout << "gap: " << (gap * 100) << " %" << std::endl;
-        cout << "status: " << cplex.getStatus() << std::endl;
+    cout << "time: " << elapsed << std::endl;
+    cout << "obj: " << cplex.getObjValue() << std::endl;
+    cout << "best_obj: " << cplex.getBestObjValue() << std::endl;
+    cout << "gap: " << (gap * 100) << " %" << std::endl;
+    cout << "status: " << cplex.getStatus() << std::endl;
 
-        print_solution(cplex, x, y, z, instance, 1, solution);
+    print_solution(cplex, x, y, z, instance, 1, solution);
 
-        WSN_solution solution_checker(instance);
+    WSN_solution solution_checker(instance);
 
-        auto matrix_x = read_bin_sol_matrix(x, instance, cplex, 0);
-        auto vec_y = read_bin_vec(y, instance.n, cplex, 0);
-        auto vec_z = read_bin_vec(z, instance.n, cplex, 0);
+    auto matrix_x = read_bin_sol_matrix(x, instance, cplex, 0);
+    auto vec_y = read_bin_vec(y, instance.n, cplex, 0);
+    auto vec_z = read_bin_vec(z, instance.n, cplex, 0);
 
-        auto solution_valid = solution_checker.is_valid(matrix_x, vec_y, vec_z);
+    auto solution_valid = solution_checker.is_valid(matrix_x, vec_y, vec_z);
 
-        cout << "Solution is" << (solution_valid ? "" : " not") << " valid" << std::endl;
+    cout << "Solution is" << (solution_valid ? "" : " not") << " valid" << std::endl;
 
-        cout << "***************************************" << std::endl;
-        print_full(cplex, cout);
+    cout << "***************************************" << std::endl;
+    print_full(cplex, cout);
 
-        cplex.clear();
-        cplex.end();
+    cplex.clear();
+    cplex.end();
 }
 
 void WSN::print_full(IloCplex &cplex, std::ostream &cout)

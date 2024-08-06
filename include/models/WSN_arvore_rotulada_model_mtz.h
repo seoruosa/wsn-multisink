@@ -6,12 +6,19 @@ class WSN_arv_rot_model_mtz_base : public WSN_arvore_rotulada_model_base
 {
 public:
     WSN_arv_rot_model_mtz_base(WSN_data &instance);
+    WSN_arv_rot_model_mtz_base(WSN_data &instance, double upper_bound);
 
 private:
     virtual void build_model();
 };
 
 WSN_arv_rot_model_mtz_base::WSN_arv_rot_model_mtz_base(WSN_data &instance) : WSN_arvore_rotulada_model_base(instance)
+{
+    WSN::formulation_name = "MAR-mtz-base";
+}
+
+WSN_arv_rot_model_mtz_base::WSN_arv_rot_model_mtz_base(WSN_data &instance,
+                                                       double upper_bound) : WSN_arvore_rotulada_model_base(instance, upper_bound)
 {
     WSN::formulation_name = "MAR-mtz-base";
 }
@@ -28,6 +35,7 @@ inline void WSN_arv_rot_model_mtz_base::build_model()
     add_master_not_adj_master_constraints();
     add_bridges_not_neighbor_constraints();
     add_bridge_master_neighbor_constraints();
+    add_upper_bound_constraint();
 
     add_trivial_tree_constraints();
 
@@ -47,12 +55,19 @@ class WSN_arv_rot_model_mtz : public WSN_arvore_rotulada_model_base
 {
 public:
     WSN_arv_rot_model_mtz(WSN_data &instance);
+    WSN_arv_rot_model_mtz(WSN_data &instance, double upper_bound);
 
 private:
     virtual void build_model();
 };
 
 WSN_arv_rot_model_mtz::WSN_arv_rot_model_mtz(WSN_data &instance) : WSN_arvore_rotulada_model_base(instance)
+{
+    WSN::formulation_name = "MAR-mtz";
+}
+
+WSN_arv_rot_model_mtz::WSN_arv_rot_model_mtz(WSN_data &instance,
+                                             double upper_bound) : WSN_arvore_rotulada_model_base(instance, upper_bound)
 {
     WSN::formulation_name = "MAR-mtz";
 }
@@ -69,6 +84,7 @@ inline void WSN_arv_rot_model_mtz::build_model()
     add_master_not_adj_master_constraints();
     add_bridges_not_neighbor_constraints();
     add_bridge_master_neighbor_constraints();
+    add_upper_bound_constraint();
 
     add_trivial_tree_constraints();
 

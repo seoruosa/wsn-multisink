@@ -10,6 +10,7 @@ class WSN_mcf_weight_model_base : public WSN
 {
 public:
     WSN_mcf_weight_model_base(WSN_data &instance);
+    WSN_mcf_weight_model_base(WSN_data &instance, double upper_bound);
 
 protected:
     virtual void build_model();
@@ -20,8 +21,7 @@ protected:
     IloArray<IloNumVarArray> y_sink; // master sink assignment
     IloArray<IloNumVarArray> z_sink; // bridge sink assignment
 
-    IloNumVar T;
-    int M;
+    double M;
 
     virtual void add_objective_function();
 
@@ -47,7 +47,16 @@ protected:
 };
 
 WSN_mcf_weight_model_base::WSN_mcf_weight_model_base(WSN_data &instance) : WSN(instance, "MCF-Model-weightAsFlow-base"),
-                                                                           T(IloNumVar(env, 0, IloInfinity, ILOFLOAT)),
+                                                                           x_sink(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
+                                                                           f_sink(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
+                                                                           y_sink(IloArray<IloNumVarArray>(env)),
+                                                                           z_sink(IloArray<IloNumVarArray>(env)),
+                                                                           M(calculates_big_M())
+{
+}
+
+WSN_mcf_weight_model_base::WSN_mcf_weight_model_base(WSN_data &instance,
+                                                     double upper_bound) : WSN(instance, "MCF-Model-weightAsFlow-base", upper_bound),
                                                                            x_sink(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
                                                                            f_sink(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
                                                                            y_sink(IloArray<IloNumVarArray>(env)),
@@ -91,6 +100,7 @@ inline void WSN_mcf_weight_model_base::build_model()
     add_master_not_adj_master_constraints();
     add_bridges_not_neighbor_constraints();
     add_bridge_master_neighbor_constraints();
+    add_upper_bound_constraint();
 
     add_trivial_tree_constraints();
 
@@ -189,7 +199,7 @@ inline void WSN_mcf_weight_model_base::add_ahani2019_mcf_constraints()
         clear_expr();
     }
 
-// force to zero variables 
+    // force to zero variables
     for (int k = 0; k < instance.number_trees; k++)
     {
         for (int l = 0; l < instance.number_trees; l++)

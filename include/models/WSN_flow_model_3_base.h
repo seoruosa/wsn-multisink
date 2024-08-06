@@ -3,23 +3,22 @@
 #include "WSN.h"
 
 /**
- * @brief A flow-based model where the flow from a node i it is 
+ * @brief A flow-based model where the flow from a node i it is
  * the weight of tree rooted at i. It is based on work of Robertty.
- * 
+ *
  */
 class WSN_flow_model_3_base : public WSN
 {
 public:
     WSN_flow_model_3_base(WSN_data &instance);
+    WSN_flow_model_3_base(WSN_data &instance, double upper_bound);
 
-// protected:
+    // protected:
     virtual void build_model();
 
     IloArray<IloNumVarArray> f;
 
-    IloNumVar T;
-
-    int M;
+    double M;
 
     virtual void add_objective_function();
 
@@ -52,8 +51,14 @@ public:
 
 WSN_flow_model_3_base::WSN_flow_model_3_base(WSN_data &instance) : WSN(instance, "FlowModel3-base"),
                                                                    f(IloArray<IloNumVarArray>(env, instance.n + instance.number_trees)),
-                                                                   T(IloNumVar(env, 0, IloInfinity, ILOFLOAT)),
-                                                                   M(int(calculates_big_M()))
+                                                                   M(calculates_big_M())
+{
+}
+
+WSN_flow_model_3_base::WSN_flow_model_3_base(WSN_data &instance,
+                                             double upper_bound) : WSN(instance, "FlowModel3-base", upper_bound),
+                                                                   f(IloArray<IloNumVarArray>(env, instance.n + instance.number_trees)),
+                                                                   M(calculates_big_M())
 {
 }
 
@@ -78,6 +83,7 @@ void WSN_flow_model_3_base::build_model()
     add_bridge_master_neighbor_constraints(); // exp 14
     add_master_neighbor_constraints();        // exp 21
     add_trivial_tree_constraints();
+    add_upper_bound_constraint();
 
     add_flow_limit_constraints();        // exp 5, 7, 8
     add_flow_conservation_constraints(); // exp 6
@@ -369,18 +375,15 @@ void WSN_flow_model_3_base::add_testing_valid_inequalities()
     {
         for (auto &u : instance.adj_list_from_v[v])
         {
-            expr += instance.weight[v][u]*(x[v][u] - z[v]);
+            expr += instance.weight[v][u] * (x[v][u] - z[v]);
         }
-        
+
         for (int k = 0; k < instance.number_trees; k++)
         {
             // constraints.add(f[instance.n + k][v] >= expr); // des. val. 3 // falso
-            constraints.add(f[instance.n + k][v] <= M*y[v]); // des. val. 4
+            constraints.add(f[instance.n + k][v] <= M * y[v]); // des. val. 4
         }
-        
     }
-    
-
 
     expr.end();
 }
@@ -399,13 +402,13 @@ inline void WSN_flow_model_3_base::add_lower_bound_weight_2_levels()
     {
         for (auto &to : instance.adj_list_from_v[u])
         {
-            expr += x[u][to]*instance.weight[u][to];
+            expr += x[u][to] * instance.weight[u][to];
 
             for (auto &v : instance.adj_list_from_v[to])
             {
                 if (v != u)
                 {
-                    expr += x[to][v]*instance.weight[to][v];
+                    expr += x[to][v] * instance.weight[to][v];
                 }
             }
         }
@@ -414,7 +417,7 @@ inline void WSN_flow_model_3_base::add_lower_bound_weight_2_levels()
         clear_expr();
     }
 
-    expr.end();    
+    expr.end();
 }
 
 void WSN_flow_model_3_base::add_remove_symmetries()

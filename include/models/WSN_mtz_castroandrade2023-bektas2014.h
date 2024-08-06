@@ -6,12 +6,19 @@ class WSN_mtz_castro_andrade_2023_bektas2014 : public WSN_mtz_castro_andrade_202
 {
 public:
     WSN_mtz_castro_andrade_2023_bektas2014(WSN_data &instance);
+    WSN_mtz_castro_andrade_2023_bektas2014(WSN_data &instance, double upper_bound);
 
 private:
     virtual void build_model() override;
 };
 
 WSN_mtz_castro_andrade_2023_bektas2014::WSN_mtz_castro_andrade_2023_bektas2014(WSN_data &instance) : WSN_mtz_castro_andrade_2023_sbpo(instance)
+{
+    WSN::formulation_name = "MTZ-castro2023-bektas";
+}
+
+WSN_mtz_castro_andrade_2023_bektas2014::WSN_mtz_castro_andrade_2023_bektas2014(WSN_data &instance,
+                                                                               double upper_bound) : WSN_mtz_castro_andrade_2023_sbpo(instance, upper_bound)
 {
     WSN::formulation_name = "MTZ-castro2023-bektas";
 }
@@ -29,6 +36,7 @@ void WSN_mtz_castro_andrade_2023_bektas2014::build_model()
     add_master_not_adj_master_constraints();   // Const CA2023 -> 5
     add_bridges_not_neighbor_constraints();    // Const CA2023 -> 7
     add_bridge_master_neighbor_constraints();  // Const CA2023 -> 8
+    add_upper_bound_constraint();
 
     add_in_coming_edge_mtz_constraints(); // Const CA2023 -> 3
 
@@ -42,8 +50,8 @@ void WSN_mtz_castro_andrade_2023_bektas2014::build_model()
 
     add_castrodeAndrade2023_constraints(); // Const CA2023 -> 12, 15, 16, 17, 10 (implementation had been corrected),
     //                                                             18, 19, 20, 21, 22, 23
-    
-    // add_adasme2023_valid_inequalities(); 
+
+    // add_adasme2023_valid_inequalities();
     add_bektas2014_constraints();
 
     add_objective_function(); // Const CA2023 -> pag 5

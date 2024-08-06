@@ -6,10 +6,17 @@ class WSN_flow_model_2_1 : public WSN_flow_model_2_1_base
 {
 public:
     WSN_flow_model_2_1(WSN_data &instance);
+    WSN_flow_model_2_1(WSN_data &instance, double upper_bound);
     virtual void build_model();
 };
 
 WSN_flow_model_2_1::WSN_flow_model_2_1(WSN_data &instance) : WSN_flow_model_2_1_base(instance)
+{
+    WSN::formulation_name = "FlowModel2-1";
+}
+
+WSN_flow_model_2_1::WSN_flow_model_2_1(WSN_data &instance,
+                                       double upper_bound) : WSN_flow_model_2_1_base(instance, upper_bound)
 {
     WSN::formulation_name = "FlowModel2-1";
 }
@@ -30,6 +37,7 @@ inline void WSN_flow_model_2_1::build_model()
     add_node_master_or_bridge_constraints();  // exp 12
     add_bridges_not_neighbor_constraints();   // exp 13
     add_bridge_master_neighbor_constraints(); // exp 14
+    add_upper_bound_constraint();
 
     add_lower_bound_constraints();     // exp 20
     add_master_neighbor_constraints(); // exp 21

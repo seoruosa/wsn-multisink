@@ -8,7 +8,7 @@ class WSN_mtz_castro_andrade_2023_sbpo : public WSN
     // Implementação do modelo do artigo CastroAndrade2023 da SBPO
 public:
     WSN_mtz_castro_andrade_2023_sbpo(WSN_data &instance);
-    // ~WSN_mtz_model_2();
+    WSN_mtz_castro_andrade_2023_sbpo(WSN_data &instance, double upper_bound);
 
 protected:
     virtual void build_model();
@@ -17,10 +17,9 @@ protected:
     IloArray<IloNumVarArray> w;
     IloNumVarArray t;
     IloNumVarArray pi;
-    IloNumVar T;
 
     int p;
-    int M;
+    double M;
 
     void add_mtz_model_variables();
 
@@ -54,10 +53,18 @@ WSN_mtz_castro_andrade_2023_sbpo::WSN_mtz_castro_andrade_2023_sbpo(WSN_data &ins
                                                                                          w(IloArray<IloNumVarArray>(env, instance.n)),
                                                                                          t(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
                                                                                          pi(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
-                                                                                         T(IloNumVar(env, 0, IloInfinity, ILOFLOAT)),
                                                                                          p((instance.n - instance.number_trees + 1) / 2),
-                                                                                         M(int(calculates_big_M()))
-//    M(100000)
+                                                                                         M(calculates_big_M())
+{
+}
+
+WSN_mtz_castro_andrade_2023_sbpo::WSN_mtz_castro_andrade_2023_sbpo(WSN_data &instance,
+                                                                   double upper_bound) : WSN(instance, "MTZ-sbpo", upper_bound),
+                                                                                         w(IloArray<IloNumVarArray>(env, instance.n)),
+                                                                                         t(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
+                                                                                         pi(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
+                                                                                         p((instance.n - instance.number_trees + 1) / 2),
+                                                                                         M(calculates_big_M())
 {
 }
 
@@ -74,6 +81,7 @@ void WSN_mtz_castro_andrade_2023_sbpo::build_model()
     add_master_not_adj_master_constraints();   // Const CA2023 -> 5
     add_bridges_not_neighbor_constraints();    // Const CA2023 -> 7
     add_bridge_master_neighbor_constraints();  // Const CA2023 -> 8
+    add_upper_bound_constraint();
 
     add_in_coming_edge_mtz_constraints(); // Const CA2023 -> 3
 

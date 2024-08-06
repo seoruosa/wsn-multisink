@@ -10,6 +10,7 @@ class WSN_mcf_model_weight_on_node : public WSN_mcf_model_base
 {
 public:
     WSN_mcf_model_weight_on_node(WSN_data &instance);
+    WSN_mcf_model_weight_on_node(WSN_data &instance, double upper_bound);
 
 private:
     virtual void build_model() override;
@@ -17,7 +18,7 @@ private:
 
     IloArray<IloNumVarArray> w;
     IloNumVarArray t;
-    int M;
+    double M;
 
     void add_weight_calculation_variables();
     // constraints to calculate the weight of trees
@@ -26,9 +27,18 @@ private:
 };
 
 WSN_mcf_model_weight_on_node::WSN_mcf_model_weight_on_node(WSN_data &instance) : WSN_mcf_model_base(instance),
-                                                                                                   w(IloArray<IloNumVarArray>(env, instance.n)),
-                                                                                                   t(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
-                                                                                                   M(int(calculates_big_M()))
+                                                                                 w(IloArray<IloNumVarArray>(env, instance.n)),
+                                                                                 t(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
+                                                                                 M(calculates_big_M())
+{
+    WSN::formulation_name = "MCF-Model-weight-node-refactor";
+}
+
+WSN_mcf_model_weight_on_node::WSN_mcf_model_weight_on_node(WSN_data &instance,
+                                                           double upper_bound) : WSN_mcf_model_base(instance, upper_bound),
+                                                                                 w(IloArray<IloNumVarArray>(env, instance.n)),
+                                                                                 t(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)),
+                                                                                 M(calculates_big_M())
 {
     WSN::formulation_name = "MCF-Model-weight-node-refactor";
 }
@@ -45,6 +55,7 @@ inline void WSN_mcf_model_weight_on_node::build_model()
     add_master_not_adj_master_constraints();
     add_bridges_not_neighbor_constraints();
     add_bridge_master_neighbor_constraints();
+    add_upper_bound_constraint();
 
     add_trivial_tree_constraints();
 

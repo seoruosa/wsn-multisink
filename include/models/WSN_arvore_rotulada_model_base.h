@@ -4,14 +4,15 @@
 #include <limits>
 
 /**
- * @brief Class that implements the "labeled" tree formulation. 
+ * @brief Class that implements the "labeled" tree formulation.
  * The model uses variables to assign a node and arc to a tree.
- * 
+ *
  */
 class WSN_arvore_rotulada_model_base : public WSN
 {
 public:
     WSN_arvore_rotulada_model_base(WSN_data &instance);
+    WSN_arvore_rotulada_model_base(WSN_data &instance, double upper_bound);
 
 protected:
     virtual void build_model();
@@ -22,7 +23,6 @@ protected:
     IloArray<IloNumVarArray> y_sink; // master sink assignment
     IloArray<IloNumVarArray> z_sink; // bridge sink assignment
 
-    IloNumVar T;
     IloArray<IloNumVarArray> f;
 
     int p;
@@ -62,7 +62,17 @@ protected:
 };
 
 WSN_arvore_rotulada_model_base::WSN_arvore_rotulada_model_base(WSN_data &instance) : WSN(instance, "MAR-base"),
-                                                                                     T(IloNumVar(env, 0, IloInfinity, ILOFLOAT)),
+                                                                                     x_sink(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
+                                                                                     y_sink(IloArray<IloNumVarArray>(env)),
+                                                                                     z_sink(IloArray<IloNumVarArray>(env)),
+                                                                                     f(IloArray<IloNumVarArray>(env, instance.n + instance.number_trees)),
+                                                                                     p((instance.n - instance.number_trees + 1) / 2),
+                                                                                     pi(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT))
+{
+}
+
+WSN_arvore_rotulada_model_base::WSN_arvore_rotulada_model_base(WSN_data &instance,
+                                                               double upper_bound) : WSN(instance, "MAR-base", upper_bound),
                                                                                      x_sink(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
                                                                                      y_sink(IloArray<IloNumVarArray>(env)),
                                                                                      z_sink(IloArray<IloNumVarArray>(env)),
@@ -84,6 +94,7 @@ inline void WSN_arvore_rotulada_model_base::build_model()
     add_master_not_adj_master_constraints();
     add_bridges_not_neighbor_constraints();
     add_bridge_master_neighbor_constraints();
+    add_upper_bound_constraint();
 
     add_trivial_tree_constraints();
 

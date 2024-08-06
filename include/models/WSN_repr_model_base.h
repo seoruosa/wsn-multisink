@@ -9,6 +9,7 @@ class WSN_representante_model_base : public WSN
 {
 public:
     WSN_representante_model_base(WSN_data &instance);
+    WSN_representante_model_base(WSN_data &instance, double upper_bound);
 
 protected:
     virtual void build_model();
@@ -18,7 +19,6 @@ protected:
     IloArray<IloNumVarArray> y_sink; // master sink assignment
     IloArray<IloNumVarArray> z_sink; // bridge sink assignment
 
-    IloNumVar T;
     IloArray<IloNumVarArray> f;
 
     int p;
@@ -60,7 +60,17 @@ protected:
 };
 
 WSN_representante_model_base::WSN_representante_model_base(WSN_data &instance) : WSN(instance, "REPR-base"),
-                                                                                 T(IloNumVar(env, 0, IloInfinity, ILOFLOAT)),
+                                                                                 x_sink(IloArray<IloArray<IloNumVarArray>>(env, instance.n)),
+                                                                                 y_sink(IloArray<IloNumVarArray>(env)),
+                                                                                 z_sink(IloArray<IloNumVarArray>(env)),
+                                                                                 f(IloArray<IloNumVarArray>(env, instance.n + instance.number_trees)),
+                                                                                 p((instance.n - instance.number_trees)),
+                                                                                 pi(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT))
+{
+}
+
+WSN_representante_model_base::WSN_representante_model_base(WSN_data &instance,
+                                                           double upper_bound) : WSN(instance, "REPR-base", upper_bound),
                                                                                  x_sink(IloArray<IloArray<IloNumVarArray>>(env, instance.n)),
                                                                                  y_sink(IloArray<IloNumVarArray>(env)),
                                                                                  z_sink(IloArray<IloNumVarArray>(env)),
@@ -81,6 +91,7 @@ inline void WSN_representante_model_base::build_model()
     add_master_not_adj_master_constraints();
     add_bridges_not_neighbor_constraints();
     add_bridge_master_neighbor_constraints();
+    add_upper_bound_constraint();
 
     add_trivial_tree_constraints();
 

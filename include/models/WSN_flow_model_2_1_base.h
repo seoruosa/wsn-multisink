@@ -6,6 +6,7 @@ class WSN_flow_model_2_1_base : public WSN
 {
 public:
     WSN_flow_model_2_1_base(WSN_data &instance);
+    WSN_flow_model_2_1_base(WSN_data &instance, double upper_bound);
 
 protected:
     virtual void build_model();
@@ -16,9 +17,7 @@ protected:
 
     IloArray<IloArray<IloNumVarArray>> z_depot; // arc-depot assignment
 
-    IloNumVar T;
-
-    int M;
+    double M;
 
     virtual void add_objective_function();
 
@@ -55,8 +54,15 @@ WSN_flow_model_2_1_base::WSN_flow_model_2_1_base(WSN_data &instance) : WSN(insta
                                                                        f(IloArray<IloNumVarArray>(env, instance.n + instance.number_trees)),
                                                                        l(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)), // Node current formulation
                                                                        z_depot(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
-                                                                       T(IloNumVar(env, 0, IloInfinity, ILOFLOAT)),
-                                                                       M(int(calculates_big_M()))
+                                                                       M(calculates_big_M())
+{
+}
+
+WSN_flow_model_2_1_base::WSN_flow_model_2_1_base(WSN_data &instance, double upper_bound) : WSN(instance, "FlowModel2-1-base", upper_bound),
+                                                                                           f(IloArray<IloNumVarArray>(env, instance.n + instance.number_trees)),
+                                                                                           l(IloNumVarArray(env, instance.n, 0, IloInfinity, ILOFLOAT)), // Node current formulation
+                                                                                           z_depot(IloArray<IloArray<IloNumVarArray>>(env, instance.number_trees)),
+                                                                                           M(calculates_big_M())
 {
 }
 
@@ -82,6 +88,7 @@ void WSN_flow_model_2_1_base::build_model()
     add_node_master_or_bridge_constraints();  // exp 12
     add_bridges_not_neighbor_constraints();   // exp 13
     add_bridge_master_neighbor_constraints(); // exp 14
+    add_upper_bound_constraint();
 
     add_lower_bound_constraints();     // exp 20
     add_master_neighbor_constraints(); // exp 21
@@ -388,7 +395,7 @@ inline void WSN_flow_model_2_1_base::add_adasme2023_valid_inequalities()
 }
 
 void WSN_flow_model_2_1_base::add_bektas2020_node_current_constraints()
-{ 
+{
     for (int i = 0; i < instance.n; i++)
     {
         for (auto &j : instance.adj_list_from_v[i])
