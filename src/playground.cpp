@@ -7,6 +7,7 @@
 #include <stdexcept>
 
 #include "models/WSN_flow_model_2_1_base.h"
+#include "arguments_parser.h"
 
 class Base
 {
@@ -140,7 +141,7 @@ void MyModel::build_model()
 /********************************************************************************************/
 /********************************************************************************************/
 
-int main()
+int main(int argc, char *argv[])
 {
     auto line = [](auto s="~")
     {
@@ -152,29 +153,33 @@ int main()
         std::cout << std::endl;
     };
 
-    auto der = Derived();
-    auto der2 = Derived2();
+    // auto der = Derived();
+    // auto der2 = Derived2();
 
 
-    line("-");
+    // line("-");
 
-    std::cout << ">>> ADD FUNCTIONS <<<" << std::endl;
+    // std::cout << ">>> ADD FUNCTIONS <<<" << std::endl;
 
-    Part<Derived2> part(der2);
-    part.addFunction("f", &Derived2::f);
-    part.addFunction("g", &Derived2::g);
-    part.addFunction("h", &Derived2::h);
+    // Part<Derived2> part(der2);
+    // part.addFunction("f", &Derived2::f);
+    // part.addFunction("g", &Derived2::g);
+    // part.addFunction("h", &Derived2::h);
 
-    line("-");
+    // line("-");
 
-    std::cout << ">>> RUN FUNCTIONS <<<" << std::endl;
+    // std::cout << ">>> RUN FUNCTIONS <<<" << std::endl;
 
-    std::vector<std::string> abc({"f", "g", "h"});
+    // std::vector<std::string> abc({"f", "g", "h"});
 
-    for (auto &el : abc)
-    {
-        part(el);
-    }
+    // for (auto &el : abc)
+    // {
+    //     part(el);
+    // }
 
-    line("#");
+    // line("#");
+
+    auto params = read_arguments(argc, argv);
+
+    std::cout << params << std::endl;
 }
